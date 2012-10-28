@@ -8,7 +8,6 @@
     <property name="ace" value="${scripts}/ace"/>
     <property name="ace.src" value="./support/ace"/>
     <property name="server.url" value="http://demo.exist-db.org/exist/apps/public-repo/public/"/>
-    <property name="server.pass" value="eXistance"/>
     <target name="all" depends="ace,xar"/>
     <target name="ace">
         <mkdir dir="${ace}"/>
@@ -32,6 +31,9 @@
         </zip>
     </target>
     <target name="upload">
+        <input message="Enter password:" addproperty="server.pass" defaultvalue="">
+            <handler type="secure"/>
+        </input>
         <property name="xar" value="${app.name}-${app.version}.xar"/>
         <exec executable="curl">
             <arg line="-T ${build}/${xar} -u admin:${server.pass} ${server.url}/${xar}"/>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repo:meta xmlns="http://exist-db.org/xquery/repo" xmlns:repo="http://exist-db.org/xquery/repo">
+    <repo:description>Shared resources used by other apps</repo:description>
+    <repo:author>Wolfgang Meier</repo:author>
+    <repo:website/>
+    <repo:status>alpha</repo:status>
+    <repo:license>GNU-LGPL</repo:license>
+    <repo:copyright>true</repo:copyright>
+    <repo:type>library</repo:type>
+    <repo:target>/db/shared-resources</repo:target>
+    <repo:prepare></repo:prepare>
+    <repo:finish/>
+    <repo:permissions user="admin" password="" group="dba" mode="0775"/>
+</repo:meta>

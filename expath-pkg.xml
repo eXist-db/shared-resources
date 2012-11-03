@@ -9,8 +9,4 @@
         <namespace>http://exist-db.org/xquery/templates</namespace>
         <file>templates.xql</file>
     </xquery>
-    <xquery>
-        <namespace>http://exist-db.org/xquery/apps/config</namespace>
-        <file>appconfig.xqm</file>
-    </xquery>
 </package>

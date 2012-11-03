@@ -35,7 +35,8 @@
             return this.each(function() {
                 var plugin = $(this);
                 var settings = {
-                    mode: "text"
+                    mode: "text",
+                    theme: "tomorrow_night"
                 };
           
                 if (options) {
@@ -89,7 +90,7 @@
                 }
                 
                 
-                var theme = _require("ace/theme/tomorrow_night");
+                var theme = _require("ace/theme/" + settings.theme);
                 var dom = _require("ace/lib/dom");
             
                 var data = $(this).text();
@@ -101,7 +102,13 @@
             
                 dom.importCssString(highlighted.css, "ace_highlight");
                 $(this).html(highlighted.html);
+                
+                $(this).data("text", data);
             });
+        },
+        
+        getText: function() {
+            return $(this).data("text");
         }
     };
 

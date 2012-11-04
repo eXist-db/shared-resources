@@ -8,22 +8,17 @@ xquery version "3.0";
 :)
 module namespace templates="http://exist-db.org/xquery/templates";
 
-import module namespace config="http://exist-db.org/xquery/apps/config" at "config.xqm";
 import module namespace inspect="http://exist-db.org/xquery/inspection" at "java:org.exist.xquery.functions.inspect.InspectionModule";
 
 declare variable $templates:CONFIG_STOP_ON_ERROR := "stop-on-error";
+declare variable $templates:CONFIG_APP_ROOT := "app-root";
+declare variable $templates:CONFIG_ROOT := "root";
 
 declare variable $templates:CONFIGURATION := "configuration";
 declare variable $templates:CONFIGURATION_ERROR := QName("http://exist-db.org/xquery/templates", "ConfigurationError");
 declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templates", "NotFound");
 declare variable $templates:TOO_MANY_ARGS := QName("http://exist-db.org/xquery/templates", "TooManyArguments");
 declare variable $templates:PROCESSING_ERROR := QName("http://exist-db.org/xquery/templates", "ProcessingError");
-
-declare variable $templates:root-collection :=
-    let $root := request:get-attribute("templating.root")
-    return
-        if ($root) then $root else $config:app-root
-;
 
 (:~
  : Start processing the provided content. Template functions are looked up by calling the
@@ -40,7 +35,7 @@ declare variable $templates:root-collection :=
 :)
 declare function templates:apply($content as node()+, $resolver as function(xs:string, xs:int) as item()?, $model as map(*)?,
     $configuration as map(*)?) {
-    let $model := if ($model) then $model else map:new()
+    let $model := if (exists($model)) then $model else map:new()
     let $configuration := 
         if (exists($configuration)) then 
             map:new(($configuration, map { "resolve" := $resolver }))
@@ -294,31 +289,45 @@ declare %private function templates:cast($values as item()*, $targetType as xs:s
                     $value
 };
 
+declare function templates:get-app-root($model as map(*)) as xs:string? {
+    $model($templates:CONFIGURATION)($templates:CONFIG_APP_ROOT)
+};
+
+declare function templates:get-root($model as map(*)) as xs:string? {
+    let $appRoot := templates:get-app-root($model)
+    let $root := $model($templates:CONFIGURATION)($templates:CONFIG_ROOT)
+    return
+        if ($root) then $root else $appRoot
+};
+
 (:-----------------------------------------------------------------------------------
  : Standard templates
  :-----------------------------------------------------------------------------------:)
  
 declare function templates:include($node as node(), $model as map(*), $path as xs:string) {
+    let $appRoot := templates:get-app-root($model)
+    let $root := templates:get-root($model)
     let $path := 
         if (starts-with($path, "/")) then
             (: Search template relative to app root :)
-            concat($config:app-root, "/", $path)
+            concat($appRoot, "/", $path)
         else
             (: Locate template relative to HTML file :)
-            concat($templates:root-collection, "/", $path)
+            concat($root, "/", $path)
     return
         templates:process(doc($path), $model)
-
 };
 
 declare function templates:surround($node as node(), $model as map(*), $with as xs:string, $at as xs:string?, $using as xs:string?) {
+    let $appRoot := templates:get-app-root($model)
+    let $root := templates:get-root($model)
     let $path :=
         if (starts-with($with, "/")) then
             (: Search template relative to app root :)
-            concat($config:app-root, $with)
+            concat($appRoot, $with)
         else
             (: Locate template relative to HTML file :)
-            concat($templates:root-collection, "/", $with)
+            concat($root, "/", $with)
     let $content :=
         if ($using) then
             doc($path)//*[@id = $using]
@@ -344,6 +353,16 @@ declare %private function templates:process-surround($node as node(), $content a
                 }
         default return
             $node
+};
+
+declare 
+    %templates:wrap
+function templates:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string) {
+    for $item in $model($from)
+    return
+        element { node-name($node) } {
+            $node/@*, templates:process($node/node(), map:new(($model, map:entry($to, $item))))
+        }
 };
 
 declare function templates:if-parameter-set($node as node(), $model as map(*), $param as xs:string) as node()* {
@@ -389,7 +408,8 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
     let $eXidePath := if (doc-available("/db/eXide/index.html")) then "apps/eXide" else "eXide"
     return
         element { node-name($node) } {
-            attribute href { $context || "/" || $eXidePath || "/index.html?open=" || $config:app-root || "/" || $href },
+            attribute href { $context || "/" || $eXidePath || "/index.html?open=" || templates:get-app-root($model) || "/" || $href },
+            attribute target { "_new" },
             $node/node()
         }
 };

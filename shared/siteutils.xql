@@ -50,7 +50,7 @@ declare %private function site:expand-link($href as xs:string, $base as xs:strin
                     let $arg := $component/fn:group/string()
                     let $name := if (contains($arg, "|")) then substring-before($arg, "|") else $arg
                     let $fallback := substring-after($arg, "|")
-                    let $app := collection(concat("/db/", $name))
+                    let $app := collection(concat(repo:get-root(), "/", $name))
                     return
                         if ($app) then
                             concat(request:get-context-path(), request:get-attribute("$exist:prefix"), "/", $name)

@@ -16,17 +16,51 @@ declare variable $apputil:NOT_FOUND := xs:QName("apputil:NOT_FOUND");
 declare variable $apputil:DEPENDENCY := xs:QName("apputil:DEPENDENCY");
 
 (:~
- : Try to find an application by its unique name and return the path to which it
+ : Try to find an application by its unique name and return the relative path to which it
  : has been deployed inside the database.
  : 
  : @param $pkgURI unique name of the application
- : @return the database path to the application or the empty sequence if it could
- : not be found or is not deployed into the db
+ : @return database path relative to the collection returned by repo:get-root() 
+ : or the empty sequence if the package could not be found or is not deployed into the db
  :)
-declare function apputil:get-application-path($pkgURI as xs:string) as xs:string? {
-    let $repo := apputil:get-resource($pkgURI, "repo.xml")
+declare function apputil:resolve($uri as xs:string) as xs:string {
+    let $path := collection(repo:get-root())//expath:package[@name = $uri]
     return
-        $repo//repo:target
+        if ($path) then
+            substring-after(util:collection-name($path), repo:get-root())
+        else
+            ()
+};
+
+(:~
+ : Try to find an application by its abbreviated name and return the relative path to which it
+ : has been deployed inside the database.
+ : 
+ : @param $pkgURI unique name of the application
+ : @return database path relative to the collection returned by repo:get-root() 
+ : or the empty sequence if the package could not be found or is not deployed into the db
+ :)
+declare function apputil:resolve-abbrev($abbrev as xs:string) as xs:string {
+    let $path := collection(repo:get-root())//expath:package[@abbrev = $abbrev]
+    return
+        if ($path) then
+            substring-after(util:collection-name($path), repo:get-root())
+        else
+            ()
+};
+
+(:~
+ : Locates the package identified by $uri and returns a path which can be used to link
+ : to this package from within the HTML view of another package.
+ : 
+ : $uri the unique name of the package to locate
+ : $relLink a relative path to be added to the returned path
+ :)
+declare function apputil:link-to-app($uri as xs:string, $relLink as xs:string?) as xs:string {
+    let $app := apputil:resolve($uri)
+    let $path := string-join((request:get-attribute("$exist:prefix"), $app, $relLink), "/")
+    return
+        replace($path, "/+", "/")
 };
 
 (:~
@@ -97,26 +131,50 @@ declare %private function apputil:download-and-install($uri as xs:anyURI, $serve
             let $package-mimetype := "application/xar"
             let $package-data := xs:base64Binary($http-response/httpclient:body/text())
             let $stored := xmldb:store($tempColl, $name, $package-data, $package-mimetype)
-            let $meta := 
-                compression:unzip(
-                    util:binary-doc($stored), apputil:entry-filter#3, 
-                    (),  apputil:entry-data#4, ()
-                )
-            let $dependencies := apputil:unresolved-dependencies($meta//expath:package)
-            return (
-                for $dep in $dependencies
-                return
-                    apputil:install-dependency($dep, $serverUri),
-                let $package := $meta//expath:package/string(@name)
-                let $type := $meta//repo:meta//repo:type/string()
-                let $remove := apputil:remove($package)
-                let $install :=
-                    repo:install-from-db($stored)
-                let $deploy :=
-                    repo:deploy($package)
-                return
+            let $meta :=
+                try {
+                    compression:unzip(
+                        util:binary-doc($stored), apputil:entry-filter#3, 
+                        (),  apputil:entry-data#4, ()
+                    )
+                } catch * {
+                    error($apputil:BAD_ARCHIVE, "Failed to unpack archive: " || $err:description)
+                }
+            return
+                if (apputil:check-package($meta)) then
+                    let $dependencies := apputil:unresolved-dependencies($meta//expath:package)
+                    return (
+                        for $dep in $dependencies
+                        return
+                            apputil:install-dependency($dep, $serverUri),
+                        let $package := $meta//expath:package/string(@name)
+                        let $type := $meta//repo:meta//repo:type/string()
+                        let $remove := apputil:remove($package)
+                        let $install :=
+                            repo:install-from-db($stored)
+                        let $deploy :=
+                            repo:deploy($package)
+                        return
+                            ()
+                    )
+                else
+                    (: apputil:check-package throws an error :)
                     ()
-            )
+};
+
+declare %private function apputil:check-package($meta as node()*) as xs:boolean {
+    if (count($meta) != 2) then
+        error($apputil:BAD_ARCHIVE, "A package must contain an expath-repo.xml and repo.xml descriptor")
+    else
+        let $pkg := $meta//expath:package
+        let $repo := $meta//repo:meta
+        return
+            if (empty($pkg)) then
+                error($apputil:BAD_ARCHIVE, "Failed to load package descriptor: expath:package root element not found.")
+            else if (empty($repo)) then
+                error($apputil:BAD_ARCHIVE, "Failed to load deployment descriptor: repo:meta root element not found.")
+            else
+                true()
 };
 
 declare %private function apputil:install-dependency($name as xs:string, $serverUri as xs:string) {
@@ -135,24 +193,32 @@ declare function apputil:upload($serverUri as xs:anyURI) as xs:string {
         if ($docName) then
             let $stored := xmldb:store($apputil:collection, xmldb:encode-uri($docName), $file)
             let $meta :=
-                compression:unzip(
-                    util:binary-doc($stored), apputil:entry-filter#3,
-                    (),  apputil:entry-data#4, ()
-                )
-            let $dependencies := apputil:unresolved-dependencies($meta//expath:package)
-            return (
-                for $dep in $dependencies
-                return
-                    apputil:install-dependency($dep, $serverUri),
-                let $package := $meta//expath:package/string(@name)
-                let $remove := apputil:remove($package)
-                let $install :=
-                    repo:install-from-db($stored)
-                let $deployed :=
-                    repo:deploy($package)
-                return
-                    $docName
-            )
+                try {
+                    compression:unzip(
+                        util:binary-doc($stored), apputil:entry-filter#3, 
+                        (),  apputil:entry-data#4, ()
+                    )
+                } catch * {
+                    error($apputil:BAD_ARCHIVE, "Failed to unpack archive: " || $err:description)
+                }
+            return
+                if (apputil:check-package($meta)) then
+                    let $dependencies := apputil:unresolved-dependencies($meta//expath:package)
+                    return (
+                        for $dep in $dependencies
+                        return
+                            apputil:install-dependency($dep, $serverUri),
+                        let $package := $meta//expath:package/string(@name)
+                        let $remove := apputil:remove($package)
+                        let $install :=
+                            repo:install-from-db($stored)
+                        let $deployed :=
+                            repo:deploy($package)
+                        return
+                            $docName
+                    )
+                else
+                    ()
         else
             error($apputil:BAD_ARCHIVE, "No file found")
 };

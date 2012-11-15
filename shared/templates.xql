@@ -10,6 +10,8 @@ module namespace templates="http://exist-db.org/xquery/templates";
 
 import module namespace inspect="http://exist-db.org/xquery/inspection" at "java:org.exist.xquery.functions.inspect.InspectionModule";
 
+declare namespace expath="http://expath.org/ns/pkg";
+
 declare variable $templates:CONFIG_STOP_ON_ERROR := "stop-on-error";
 declare variable $templates:CONFIG_APP_ROOT := "app-root";
 declare variable $templates:CONFIG_ROOT := "root";
@@ -404,14 +406,36 @@ declare function templates:if-module-missing($node as node(), $model as map(*), 
 
 declare function templates:load-source($node as node(), $model as map(*)) as node()* {
     let $href := $node/@href/string()
-    let $context := request:get-context-path()
-    let $eXidePath := if (doc-available("/db/eXide/index.html")) then "apps/eXide" else "eXide"
+    let $link := templates:link-to-app("http://exist-db.org/apps/eXide", "index.html?open=" || templates:get-app-root($model) || "/" || $href)
     return
         element { node-name($node) } {
-            attribute href { $context || "/" || $eXidePath || "/index.html?open=" || templates:get-app-root($model) || "/" || $href },
+            attribute href { $link },
             attribute target { "_new" },
             $node/node()
         }
+};
+
+(:~
+ : Locates the package identified by $uri and returns a path which can be used to link
+ : to this package from within the HTML view of another package.
+ : 
+ : $uri the unique name of the package to locate
+ : $relLink a relative path to be added to the returned path
+ :)
+declare function templates:link-to-app($uri as xs:string, $relLink as xs:string?) as xs:string {
+    let $app := templates:resolve($uri)
+    let $path := string-join((request:get-attribute("$exist:prefix"), $app, $relLink), "/")
+    return
+        replace($path, "/+", "/")
+};
+
+declare function templates:resolve($uri as xs:string) as xs:string {
+    let $path := collection(repo:get-root())//expath:package[@name = $uri]
+    return
+        if ($path) then
+            substring-after(util:collection-name($path), repo:get-root())
+        else
+            ()
 };
 
 (:~

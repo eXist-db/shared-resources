@@ -7,8 +7,9 @@
     <repo:license>GNU-LGPL</repo:license>
     <repo:copyright>true</repo:copyright>
     <repo:type>library</repo:type>
-    <repo:target>/db/shared-resources</repo:target>
-    <repo:prepare></repo:prepare>
+    <repo:target>shared-resources</repo:target>
+    <repo:prepare/>
     <repo:finish/>
     <repo:permissions user="admin" password="" group="dba" mode="0775"/>
+    <deployed>2012-11-15T20:27:26.279+01:00</deployed>
 </repo:meta>

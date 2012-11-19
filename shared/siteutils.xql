@@ -28,8 +28,8 @@ declare %private function site:expand-links($node as node(), $base as xs:string?
         return
             if ($href) then
                 let $expanded :=
-                    if (starts-with($href, "/")) then
-                        concat(request:get-context-path(), $href)
+                    if (starts-with($href, "/") and not(starts-with($href, request:get-context-path()))) then
+                        request:get-context-path() || $href
                     else
                         try {
                             site:expand-link($href, $base)

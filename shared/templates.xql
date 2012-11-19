@@ -410,7 +410,7 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
     return
         element { node-name($node) } {
             attribute href { $link },
-            attribute target { "_new" },
+            attribute target { "eXide" },
             $node/node()
         }
 };
@@ -424,7 +424,7 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
  :)
 declare function templates:link-to-app($uri as xs:string, $relLink as xs:string?) as xs:string {
     let $app := templates:resolve($uri)
-    let $path := string-join((request:get-attribute("$exist:prefix"), $app, $relLink), "/")
+    let $path := string-join((request:get-context-path(), request:get-attribute("$exist:prefix"), $app, $relLink), "/")
     return
         replace($path, "/+", "/")
 };

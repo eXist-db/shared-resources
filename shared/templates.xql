@@ -410,7 +410,7 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
     return
         element { node-name($node) } {
             attribute href { $link },
-            attribute target { "eXide" },
+            attribute target { "_new" },
             $node/node()
         }
 };
@@ -424,7 +424,7 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
  :)
 declare function templates:link-to-app($uri as xs:string, $relLink as xs:string?) as xs:string {
     let $app := templates:resolve($uri)
-    let $path := string-join((request:get-context-path(), request:get-attribute("$exist:prefix"), $app, $relLink), "/")
+    let $path := string-join((request:get-attribute("$exist:prefix"), $app, $relLink), "/")
     return
         replace($path, "/+", "/")
 };
@@ -445,15 +445,24 @@ declare function templates:resolve($uri as xs:string) as xs:string {
 declare function templates:form-control($node as node(), $model as map(*)) as node()* {
     typeswitch ($node)
         case element(input) return
+            let $type := $node/@type
             let $name := $node/@name
             let $value := request:get-parameter($name, ())
             return
                 if ($value) then
-                    element { node-name($node) } {
-                        $node/@* except $node/@value,
-                        attribute value { $value },
-                        $node/node()
-                    }
+                    switch ($type)
+                        case "checkbox" case "radio" return
+                            element { node-name($node) } {
+                                $node/@* except $node/@checked,
+                                attribute checked { "checked" },
+                                $node/node()
+                            }
+                        default return
+                            element { node-name($node) } {
+                                $node/@* except $node/@value,
+                                attribute value { $value },
+                                $node/node()
+                            }
                 else
                     $node
         case element(select) return

@@ -88,13 +88,20 @@ declare function apputil:get-resource($app as xs:string, $path as xs:string) as 
  : 
  : @param $pkgURI unique name of the application
  :)
-declare function apputil:is-installed($pkgURI as xs:anyURI) as element(expath:package)? {
+declare function apputil:is-installed($pkgURI as xs:anyURI, $version as xs:string?) as element(expath:package)? {
     apputil:scan-repo(function($uri, $expath, $repo) {
         if ($uri = $pkgURI) then
-            $expath/*
+            if (empty($version) or $expath/*/@version = $version) then
+                $expath/*
+            else
+                ()
         else
             ()
     })
+};
+
+declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $serverUri as xs:anyURI) {
+    apputil:install-from-repo($name, $package-path, $serverUri)
 };
 
 (:~
@@ -106,12 +113,17 @@ declare function apputil:is-installed($pkgURI as xs:anyURI) as element(expath:pa
  : @param $serverUri the URI of the public-repo app on the server
  : @return the empty sequence
  :)
-declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $serverUri as xs:anyURI) {
+declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $serverUri as xs:anyURI, $version as xs:string?) {
     let $package-url := 
         if (exists($name)) then
-            "modules/find.xql?name=" || $name
+            "modules/find.xql?name=" || encode-for-uri($name)
         else
             $package-path
+    let $package-url :=
+        if ($version) then
+            $package-url || "&amp;version=" || $version
+        else
+            $package-url
     return
         if (exists($package-url)) then
             apputil:download-and-install($package-url, $serverUri)
@@ -127,7 +139,7 @@ declare %private function apputil:download-and-install($uri as xs:anyURI, $serve
         if ($status != "200") then
             error($apputil:NOT_FOUND, "Application package not found: " || $uri)
         else
-            let $name := tokenize($uri, "/")[last()]
+            let $name := util:hash($uri, "md5") || ".xar"
             let $package-mimetype := "application/xar"
             let $package-data := xs:base64Binary($http-response/httpclient:body/text())
             let $stored := xmldb:store($tempColl, $name, $package-data, $package-mimetype)
@@ -163,7 +175,7 @@ declare %private function apputil:download-and-install($uri as xs:anyURI, $serve
 };
 
 declare %private function apputil:check-package($meta as node()*) as xs:boolean {
-    if (count($meta) != 2) then
+    if (count($meta) < 2) then
         error($apputil:BAD_ARCHIVE, "A package must contain an expath-repo.xml and repo.xml descriptor")
     else
         let $pkg := $meta//expath:package
@@ -177,11 +189,11 @@ declare %private function apputil:check-package($meta as node()*) as xs:boolean 
                 true()
 };
 
-declare %private function apputil:install-dependency($name as xs:string, $serverUri as xs:string) {
+declare %private function apputil:install-dependency($dependency as element(expath:dependency), $serverUri as xs:string) {
     try {
-        apputil:install-from-repo($name, (), $serverUri)
+        apputil:install-from-repo($dependency/@package, (), $serverUri, $dependency/@version)
     } catch * {
-        error($apputil:DEPENDENCY, "Failed to install dependency " || $name)
+        error($apputil:DEPENDENCY, "Failed to install dependency " || $dependency/@package/string())
     }
 };
 
@@ -253,14 +265,14 @@ declare function apputil:scan-repo($callback as function(xs:string, element(), e
         $callback($app, $expathMeta, $repoMeta)
 };
 
-declare %private function apputil:unresolved-dependencies($expath as element(expath:package)) {
+declare %private function apputil:unresolved-dependencies($expath as element(expath:package)) as element(expath:dependency)* {
     for $dependency in $expath/expath:dependency[@package]
     let $package := xs:anyURI($dependency/@package/string())
     return
-        if (apputil:is-installed($package)) then
+        if (apputil:is-installed($package, $dependency/@version/string())) then
             ()
         else
-            $package
+            $dependency
 };
 
 declare %private function apputil:entry-data($path as xs:anyURI, $type as xs:string, $data as item()?, $param as item()*) as item()?

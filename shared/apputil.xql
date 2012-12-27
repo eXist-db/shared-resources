@@ -175,7 +175,7 @@ declare %private function apputil:download-and-install($uri as xs:anyURI, $serve
 };
 
 declare %private function apputil:check-package($meta as node()*) as xs:boolean {
-    if (count($meta) < 2) then
+    if (count($meta) = 0) then
         error($apputil:BAD_ARCHIVE, "A package must contain an expath-repo.xml and repo.xml descriptor")
     else
         let $pkg := $meta//expath:package
@@ -183,8 +183,6 @@ declare %private function apputil:check-package($meta as node()*) as xs:boolean 
         return
             if (empty($pkg)) then
                 error($apputil:BAD_ARCHIVE, "Failed to load package descriptor: expath:package root element not found.")
-            else if (empty($repo)) then
-                error($apputil:BAD_ARCHIVE, "Failed to load deployment descriptor: repo:meta root element not found.")
             else
                 true()
 };

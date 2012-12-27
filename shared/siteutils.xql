@@ -50,25 +50,21 @@ declare %private function site:expand-links($node as node(), $base as xs:string?
 };
 
 declare %private function site:expand-link($href as xs:string, $base as xs:string?) {
-    string-join(
-        let $analyzed := analyze-string($href, "^\{([^\{\}]+)\}")
-        for $component in $analyzed/*/*
+    if (matches($href, "^\{[^\{\}]+\}")) then
+        let $replacement :=
+            let $arg := replace($href, "^\{([^\{\}]+)\}.*", "$1")
+            let $name := if (contains($arg, "|")) then substring-before($arg, "|") else $arg
+            let $app := apputil:resolve-abbrev($name)
+            let $fallback := substring-after($arg, "|")
+            return
+                if ($app) then
+                    concat(request:get-context-path(), request:get-attribute("$exist:prefix"), "/", $app)
+                else if ($fallback) then
+                    $base || $fallback
+                else
+                    error($site:NOT_FOUND, "Not found", $name)
         return
-            typeswitch($component)
-                case element(fn:match) return
-                    let $arg := $component/fn:group/string()
-                    let $name := if (contains($arg, "|")) then substring-before($arg, "|") else $arg
-                    let $app := apputil:resolve-abbrev($name)
-                    let $fallback := substring-after($arg, "|")
-                    return
-                        if ($app) then
-                            concat(request:get-context-path(), request:get-attribute("$exist:prefix"), "/", $app)
-                        else if ($fallback) then
-                            $base || $fallback
-                        else
-                            error($site:NOT_FOUND, "Not found", $name)
-                default return
-                    $component/text()
-        , ""
-    )
+            replace($href, "^\{([^\{\}]+)\}", $replacement)
+    else
+        $href
 };

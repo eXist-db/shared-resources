@@ -443,8 +443,10 @@ declare function templates:resolve($uri as xs:string) as xs:string {
     values found in the request - if present.
  :)
 declare function templates:form-control($node as node(), $model as map(*)) as node()* {
-    typeswitch ($node)
-        case element(input) return
+    let $control := local-name($node)
+    return
+        switch ($control)
+        case "input" return
             let $type := $node/@type
             let $name := $node/@name
             let $value := request:get-parameter($name, ())
@@ -465,7 +467,7 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
                             }
                 else
                     $node
-        case element(select) return
+        case "select" return
             let $value := request:get-parameter($node/@name/string(), ())
             return
                 element { node-name($node) } {

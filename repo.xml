@@ -11,5 +11,5 @@
     <repo:prepare/>
     <repo:finish/>
     <repo:permissions user="admin" password="" group="dba" mode="0775"/>
-    <deployed>2012-11-15T20:27:26.279+01:00</deployed>
+    <deployed>2013-01-18T20:47:30.81+01:00</deployed>
 </repo:meta>

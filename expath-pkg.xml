@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://expath.org/ns/pkg" name="http://exist-db.org/apps/shared" abbrev="shared" version="0.2.6" spec="1.0">
+<package xmlns="http://expath.org/ns/pkg" name="http://exist-db.org/apps/shared" abbrev="shared" version="0.2.8" spec="1.0">
     <title>Shared Resources: jquery, dojo, ace ...</title>
+    <dependency processor="eXist-db" version="trunk &gt; rev 18070"/>
     <xquery>
         <namespace>http://exist-db.org/xquery/apps</namespace>
         <file>apputil.xql</file>

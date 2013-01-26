@@ -411,6 +411,8 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
         element { node-name($node) } {
             attribute href { $link },
             attribute target { "_new" },
+            attribute class { "eXide-open" },
+            attribute data-exide-open { templates:get-app-root($model) || "/" || $href },
             $node/node()
         }
 };

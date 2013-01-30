@@ -22,6 +22,8 @@ declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templ
 declare variable $templates:TOO_MANY_ARGS := QName("http://exist-db.org/xquery/templates", "TooManyArguments");
 declare variable $templates:PROCESSING_ERROR := QName("http://exist-db.org/xquery/templates", "ProcessingError");
 
+declare variable $templates:ATTR_DATA_TEMPLATE := "data-template";
+
 (:~
  : Start processing the provided content. Template functions are looked up by calling the
  : provided function $resolver. The function should take a name as a string
@@ -69,16 +71,21 @@ declare function templates:process($nodes as node()*, $model as map(*)) {
             case document-node() return
                 for $child in $node/node() return templates:process($child, $model)
             case element() return
-                let $instructions := templates:get-instructions($node/@class)
+                let $dataAttr := $node/@data-template
                 return
-                    if ($instructions) then
-                        for $instruction in $instructions
-                        return
-                            templates:call($instruction, $node, $model)
+                    if ($dataAttr) then
+                        templates:call($dataAttr, $node, $model)
                     else
-                        element { node-name($node) } {
-                            $node/@*, for $child in $node/node() return templates:process($child, $model)
-                        }
+                        let $instructions := templates:get-instructions($node/@class)
+                        return
+                            if ($instructions) then
+                                for $instruction in $instructions
+                                return
+                                    templates:call($instruction, $node, $model)
+                            else
+                                element { node-name($node) } {
+                                    $node/@*, for $child in $node/node() return templates:process($child, $model)
+                                }
             default return
                 $node
 };
@@ -97,10 +104,24 @@ declare %private function templates:get-configuration($model as map(*), $func as
         $model($templates:CONFIGURATION)
 };
 
-declare %private function templates:call($class as xs:string, $node as element(), $model as map(*)) {
-    let $paramStr := substring-after($class, "?")
-    let $parameters := templates:parse-parameters($paramStr)
-    let $func := if ($paramStr) then substring-before($class, "?") else $class
+declare %private function templates:call($classOrAttr as item(), $node as element(), $model as map(*)) {
+    let $parameters :=
+        typeswitch ($classOrAttr)
+            case attribute() return
+                templates:parameters-from-attr($node)
+            default return
+                let $paramStr := substring-after($classOrAttr, "?")
+                return
+                    templates:parse-parameters($paramStr)
+    let $func := 
+        typeswitch ($classOrAttr)
+            case attribute() return
+                $classOrAttr/string()
+            default return
+                if (contains($classOrAttr, "?")) then
+                    substring-before($classOrAttr, "?")
+                else
+                    $classOrAttr
     let $config := templates:get-configuration($model, $func)
     let $call := templates:resolve($func, $config("resolve"))
     return
@@ -244,6 +265,17 @@ declare %private function templates:resolve($arity as xs:int, $func as xs:string
                 $fn
             else
                 templates:resolve($arity + 1, $func, $resolver)
+};
+
+declare %private function templates:parameters-from-attr($node as node()) {
+    map:new(
+        for $attr in $node/@*[starts-with(local-name(.), $templates:ATTR_DATA_TEMPLATE)]
+        return
+            map:entry(
+                replace(local-name($attr), $templates:ATTR_DATA_TEMPLATE || "\-(.*)$", "$1"),
+                $attr/string()
+            )
+    )
 };
 
 declare %private function templates:parse-parameters($paramStr as xs:string?) as map(xs:string, xs:string) {

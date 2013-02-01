@@ -14,4 +14,8 @@
         <namespace>http://exist-db.org/apps/site-utils</namespace>
         <file>siteutils.xql</file>
     </xquery>
+    <xquery>
+        <namespace>http://exist-db.org/xquery/dbutil</namespace>
+        <file>dbutils.xql</file>
+    </xquery>
 </package>

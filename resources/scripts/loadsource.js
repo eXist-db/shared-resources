@@ -15,7 +15,7 @@ $(document).ready(function() {
             if (app) {
                 // eXide is there
                 if (snip) {
-                    exide.eXide.app.newDocument(snip);
+                    exide.eXide.app.newDocument(snip, "xquery");
                 } else {
                     exide.eXide.app.findDocument(path);
                 }
@@ -30,7 +30,7 @@ $(document).ready(function() {
                 window.eXide_onload = function() {
                     console.log("onloaed called");
                     if (snip) {
-                        exide.eXide.app.newDocument(snip);
+                        exide.eXide.app.newDocument(snip, "xquery");
                     } else {
                         exide.eXide.app.findDocument(path);
                     }

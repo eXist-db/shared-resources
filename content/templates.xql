@@ -506,10 +506,9 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
             return
                 element { node-name($node) } {
                     $node/@* except $node/@class,
-                    for $option in $node/option
+                    for $option in $node/*[local-name(.) = "option"]
                     return
-                        <option>
-                        {
+                        element { node-name($option) } {
                             $option/@*,
                             if ($option/@value = $value) then
                                 attribute selected { "selected" }
@@ -517,7 +516,6 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
                                 (),
                             $option/node()
                         }
-                        </option>
                 }
         default return
             $node

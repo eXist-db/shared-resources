@@ -8,20 +8,30 @@
     <property name="ace" value="${scripts}/ace"/>
     <property name="ace.src" value="./support/ace"/>
     <property name="server.url" value="http://demo.exist-db.org/exist/apps/public-repo/public/"/>
+
+    <condition property="git.commit" value="${git.commit}" else="">
+      <isset property="git.commit" />      
+    </condition>
+
     <target name="all" depends="ace,xar"/>
+
+    <target name="rebuild" depends="clean,all"/>
+
     <target name="ace">
         <mkdir dir="${ace}"/>
         <copy todir="${ace}">
             <fileset dir="${ace.src}/build/src-min"/>
         </copy>
     </target>
+
     <target name="clean">
         <delete dir="${ace}"/>
         <delete dir="${build}"/>
     </target>
+
     <target name="xar">
         <mkdir dir="${build}"/>
-        <zip destfile="${build}/${app.name}-${app.version}.xar">
+        <zip destfile="${build}/${app.name}-${app.version}${git.commit}.xar">
             <fileset dir=".">
                 <include name="*.*"/>
                 <include name="resources/**"/>

@@ -505,12 +505,12 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
             let $value := request:get-parameter($node/@name/string(), ())
             return
                 element { node-name($node) } {
-                    $node/@* except $node/@class,
+                    $node/@*,
                     for $option in $node/*[local-name(.) = "option"]
                     return
                         element { node-name($option) } {
                             $option/@*,
-                            if ($option/@value = $value) then
+                            if ($option/@value = $value or $option/string() = $value) then
                                 attribute selected { "selected" }
                             else
                                 (),

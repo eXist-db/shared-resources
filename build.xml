@@ -21,6 +21,10 @@
         <mkdir dir="${ace}"/>
         <copy todir="${ace}">
             <fileset dir="${ace.src}/build/src-min"/>
+            <fileset dir="${ace.src}/build/kitchen-sink">
+                <!-- Required for snippet manager -->
+                <include name="demo.js"/>
+            </fileset>
         </copy>
     </target>
 

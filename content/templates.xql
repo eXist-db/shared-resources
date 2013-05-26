@@ -170,6 +170,27 @@ declare %private function templates:call-with-args($fn as function(*), $args as 
             $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7]())
         case 8 return
             $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8]())
+        case 9 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9]())
+        case 10 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9](), $args[10]())
+        case 11 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9](), $args[10](), $args[11]())
+        case 12 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9](), $args[10](), $args[11](), $args[12]())
+        case 13 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9](), $args[10](), $args[11](), $args[12](), $args[13]())
+        case 14 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9](), $args[10](), $args[11](), $args[12](), $args[13](), $args[14]())
+        case 15 return
+            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
+                $args[9](), $args[10](), $args[11](), $args[12](), $args[13](), $args[14](), $args[15]())
         default return
             error($templates:TOO_MANY_ARGS, "Too many arguments to function " || function-name($fn))
 };
@@ -352,7 +373,8 @@ declare function templates:include($node as node(), $model as map(*), $path as x
         templates:process(doc($path), $model)
 };
 
-declare function templates:surround($node as node(), $model as map(*), $with as xs:string, $at as xs:string?, $using as xs:string?) {
+declare function templates:surround($node as node(), $model as map(*), $with as xs:string, $at as xs:string?, 
+    $using as xs:string?, $options as xs:string?) {
     let $appRoot := templates:get-app-root($model)
     let $root := templates:get-root($model)
     let $path :=
@@ -367,9 +389,29 @@ declare function templates:surround($node as node(), $model as map(*), $with as 
             doc($path)//*[@id = $using]
         else
             doc($path)
+    let $model := templates:surround-options($model, $options)
     let $merged := templates:process-surround($content, $node, $at)
     return
         templates:process($merged, $model)
+};
+
+declare %private function templates:surround-options($model as map(*), $optionsStr as xs:string?) as map(*) {
+    if (exists($optionsStr)) then
+        map:new((
+            $model,
+            for $option in tokenize($optionsStr, "\s*,\s*")
+            let $keyValue := tokenize($option, "\s*=\s*")
+            return
+                if (exists($keyValue)) then
+                    if (count($keyValue) = 1) then
+                        map:entry($keyValue, true())
+                    else
+                        map:entry($keyValue[1], $keyValue[2])
+                else
+                    ()
+        ))
+    else
+        $model
 };
 
 declare %private function templates:process-surround($node as node(), $content as node(), $at as xs:string) {
@@ -427,6 +469,30 @@ declare function templates:if-attribute-set($node as node(), $model as map(*), $
             ()
 };
 
+declare function templates:if-model-key-equals($node as node(), $model as map(*), $key as xs:string, $value as xs:string) {
+    let $isSet := $model($key) = $value
+    return
+        if ($isSet) then
+            templates:process($node/node(), $model)
+        else
+            ()
+};
+
+(:~
+ : Evaluates its enclosed block unless the model property $key is set to value $value.
+ :)
+declare function templates:unless-model-key-equals($node as node(), $model as map(*), $key as xs:string, $value as xs:string) {
+    let $isSet := $model($key) = $value
+    return
+        if (not($isSet)) then
+            templates:process($node/node(), $model)
+        else
+            ()
+};
+
+(:~
+ : Evaluate the enclosed block if there's a model property $key equal to $value.
+ :)
 declare function templates:if-module-missing($node as node(), $model as map(*), $uri as xs:string, $at as xs:string) {
     try {
         util:import-module($uri, "testmod", $at)

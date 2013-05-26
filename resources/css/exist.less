@@ -1,6 +1,5 @@
 @charset "utf-8";
 
-@import url('settings.less');
 @import url('content.less');
 @import url('bootstrap.min.css');
 @import url('bootstrap-responsive.min.css');
@@ -143,7 +142,15 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
 
 /* ---------------------------------------- GENERAL STYLES ---------------------------------------- */
 
-h1 { font-size: 1.5em; padding: 0px 0 5px; margin: 0; font-weight: bold; font-family: @headingsFont; color: #0083CB; }
+h1 {
+	font-size: 1.75em;
+    font-weight: bold;
+    margin: .8em 0 0 0; 
+	padding: 0px 0 5px; 
+	margin: 0; 
+	font-family: @headingsFont; 
+	color: @blue;
+}
 h2 { font-size: 1.2em; padding: 10px 0; font-weight: bold; font-family: @headingsFont; letter-spacing: 1px; }
 h3 { font-size: 1.2em; padding: 10px 0 5px; margin: 0 0 5px; font-weight: bold; }
 h4 { font-size: 1.0em; padding: 10px 0; font-style: italic; font-weight: normal; }

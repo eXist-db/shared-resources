@@ -46,19 +46,16 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
     -moz-box-shadow: none;
 }
 
-.navbar .nav>li>.dropdown-toggle {
+.navbar .nav>li>a {
     color: #FFF;
     text-align: center;
     font: 1.2em/1em @headingsFont;
-}
-
-.navbar .nav>li>.dropdown-toggle:hover {
-    color: @orange;
-}
-
-.navbar .nav>li>a {
     padding: 18px 0;
     text-shadow: none;
+}
+
+.navbar .nav>li>a:hover {
+    color: @orange;
 }
 
 .navbar .nav>li>.dropdown-menu:before, .navbar .nav>li>.dropdown-menu:after {
@@ -81,9 +78,6 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
     
     .navbar .nav>li>a {
         padding: 9px 15px;
-    }
-    
-    .navbar .nav>li>.dropdown-toggle {
         color: #777;
     }
     
@@ -98,7 +92,7 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
         color: @orange;
     }
 
-    .nav .dropdown {
+    .nav>li {
         height: 52px;
         min-width: 150px;
         vertical-align: middle; 

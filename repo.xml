@@ -11,5 +11,15 @@
     <repo:prepare/>
     <repo:finish/>
     <repo:permissions user="admin" password="" group="dba" mode="0775"/>
-    <deployed>2013-01-18T20:47:30.81+01:00</deployed>
+    <deployed>2013-06-02T11:51:37.025+02:00</deployed>
+    <changelog>
+        <change version="0.3.5">
+            <ul xmlns="">
+                <li>Move site-wide CSS to shared-resources. Modularize design using less.</li>
+                <li>Added bootstrap</li>
+                <li>Bug fixes and minor improvements in templating</li>
+                <li>Updated ace</li>
+            </ul>
+        </change>
+    </changelog>
 </repo:meta>

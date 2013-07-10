@@ -454,7 +454,7 @@ declare function templates:if-parameter-unset($node as node(), $model as item()*
     let $param := request:get-parameter($param, ())
     return
         if (not($param) or string-length($param) eq 0) then
-            templates:process($node/node(), $model)
+            $node
         else
             ()
 };

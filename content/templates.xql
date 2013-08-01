@@ -235,11 +235,14 @@ declare %private function templates:map-argument($arg as element(argument), $par
     let $type := $arg/@type/string()
     let $reqParam := request:get-parameter($var, ())
     let $sessionParam := session:get-attribute($var)
+    let $reqAttribute := request:get-attribute($var)
     let $paramFromContext :=
         if (exists($reqParam)) then
             $reqParam
         else if (exists($sessionParam)) then
             $sessionParam
+        else if (exists($reqAttribute)) then
+            $reqAttribute
         else
             $parameters($var)
     let $param :=

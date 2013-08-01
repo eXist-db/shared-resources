@@ -256,7 +256,7 @@ declare %private function templates:map-argument($arg as element(argument), $par
             templates:cast($param, $type)
         } catch * {
             error($templates:TYPE_ERROR, "Failed to cast parameter value '" || $param || "' to the required target type for " ||
-                "template function parameter $" || $name || " of function " || ($arg/../@name) || ". Required type was: " ||
+                "template function parameter $" || $var || " of function " || ($arg/../@name) || ". Required type was: " ||
                 $type || ". " || $err:description)
         }
     return

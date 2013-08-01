@@ -21,6 +21,7 @@ declare variable $templates:CONFIGURATION_ERROR := QName("http://exist-db.org/xq
 declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templates", "NotFound");
 declare variable $templates:TOO_MANY_ARGS := QName("http://exist-db.org/xquery/templates", "TooManyArguments");
 declare variable $templates:PROCESSING_ERROR := QName("http://exist-db.org/xquery/templates", "ProcessingError");
+declare variable $templates:TYPE_ERROR := QName("http://exist-db.org/xquery/templates", "TypeError");
 
 declare variable $templates:ATTR_DATA_TEMPLATE := "data-template";
 

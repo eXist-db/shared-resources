@@ -21,6 +21,7 @@ declare variable $templates:CONFIGURATION_ERROR := QName("http://exist-db.org/xq
 declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templates", "NotFound");
 declare variable $templates:TOO_MANY_ARGS := QName("http://exist-db.org/xquery/templates", "TooManyArguments");
 declare variable $templates:PROCESSING_ERROR := QName("http://exist-db.org/xquery/templates", "ProcessingError");
+declare variable $templates:TYPE_ERROR := QName("http://exist-db.org/xquery/templates", "TypeError");
 
 declare variable $templates:ATTR_DATA_TEMPLATE := "data-template";
 
@@ -235,11 +236,14 @@ declare %private function templates:map-argument($arg as element(argument), $par
     let $type := $arg/@type/string()
     let $reqParam := request:get-parameter($var, ())
     let $sessionParam := session:get-attribute($var)
+    let $reqAttribute := request:get-attribute($var)
     let $paramFromContext :=
         if (exists($reqParam)) then
             $reqParam
         else if (exists($sessionParam)) then
             $sessionParam
+        else if (exists($reqAttribute)) then
+            $reqAttribute
         else
             $parameters($var)
     let $param :=
@@ -252,7 +256,7 @@ declare %private function templates:map-argument($arg as element(argument), $par
             templates:cast($param, $type)
         } catch * {
             error($templates:TYPE_ERROR, "Failed to cast parameter value '" || $param || "' to the required target type for " ||
-                "template function parameter $" || $name || " of function " || ($arg/../@name) || ". Required type was: " ||
+                "template function parameter $" || $var || " of function " || ($arg/../@name) || ". Required type was: " ||
                 $type || ". " || $err:description)
         }
     return

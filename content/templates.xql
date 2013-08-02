@@ -533,7 +533,7 @@ declare function templates:link-to-app($uri as xs:string, $relLink as xs:string?
         replace($path, "/+", "/")
 };
 
-declare function templates:resolve($uri as xs:string) as xs:string {
+declare function templates:resolve($uri as xs:string) as xs:string? {
     let $path := collection(repo:get-root())//expath:package[@name = $uri]
     return
         if ($path) then

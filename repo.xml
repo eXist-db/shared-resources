@@ -11,7 +11,6 @@
     <repo:prepare/>
     <repo:finish/>
     <repo:permissions user="admin" password="" group="dba" mode="0775"/>
-    <deployed>2013-06-02T11:51:37.025+02:00</deployed>
     <changelog>
         <change version="0.3.5">
             <ul xmlns="">
@@ -21,5 +20,17 @@
                 <li>Updated ace</li>
             </ul>
         </change>
+        <change version="0.3.6">
+            <ul xmlns="">
+                <li>Small syntax error in templates.xql</li>
+            </ul>
+        </change>
+        <change version="0.3.7">
+            <ul xmlns="">
+                <li>Externalised parameter value resolution in templating. Now useable outside XQuery URL Rewrite context.</li>
+                <li>Updated ace</li>
+            </ul>
+        </change>
     </changelog>
+    <deployed>2013-11-03T10:00:00.58+01:00</deployed>
 </repo:meta>

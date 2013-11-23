@@ -5,9 +5,12 @@ module namespace dbutil="http://exist-db.org/xquery/dbutil";
 (:~ Scan a collection tree recursively starting at $root. Call $func once for each collection found :)
 declare function dbutil:scan-collections($root as xs:anyURI, $func as function(xs:anyURI) as item()*) {
     $func($root),
-    for $child in xmldb:get-child-collections($root)
-    return
-        dbutil:scan-collections(xs:anyURI($root || "/" || $child), $func)
+    if (sm:has-access($root, "rx")) then
+        for $child in xmldb:get-child-collections($root)
+        return
+            dbutil:scan-collections(xs:anyURI($root || "/" || $child), $func)
+    else
+        ()
 };
 
 (:~

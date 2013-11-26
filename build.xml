@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="shared-resources">
     <property name="project.app" value="shared-resources"/>
-    <property name="project.version" value="0.3.7"/>
+    <property name="project.version" value="0.3.8"/>
     <property name="tools" value="./tools"/>
     <property name="build" value="./build"/>
     <property name="scripts" value="./resources/scripts"/>

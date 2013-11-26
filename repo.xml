@@ -31,6 +31,13 @@
                 <li>Updated ace</li>
             </ul>
         </change>
+        <change version="0.3.8">
+            <ul xmlns="">
+                <li>Fixed permission checks in dbutil module: functions should not fail if user lacks the permission to browse into a collection.</li>
+                <li>Updated ace</li>
+                <li>Fixed templates:surround to report a proper error if a template could not be found.</li>
+            </ul>
+        </change>
     </changelog>
-    <deployed>2013-11-03T10:00:00.58+01:00</deployed>
+    <deployed>2013-11-24T18:45:15.366+01:00</deployed>
 </repo:meta>

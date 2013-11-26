@@ -449,10 +449,17 @@ declare function templates:surround($node as node(), $model as map(*), $with as 
             doc($path)//*[@id = $using]
         else
             doc($path)
-    let $model := templates:surround-options($model, $options)
-    let $merged := templates:process-surround($content, $node, $at)
     return
-        templates:process($merged, $model)
+        if (empty($content)) then
+            if ($model($templates:CONFIGURATION)($templates:CONFIG_STOP_ON_ERROR)) then
+                error($templates:PROCESSING_ERROR, "surround: template not found at " || $path)
+            else
+                templates:process($node/node(), $model)
+        else
+            let $model := templates:surround-options($model, $options)
+            let $merged := templates:process-surround($content, $node, $at)
+            return
+                templates:process($merged, $model)
 };
 
 declare %private function templates:surround-options($model as map(*), $optionsStr as xs:string?) as map(*) {

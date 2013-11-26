@@ -18,9 +18,12 @@ declare function dbutil:scan-collections($root as xs:anyURI, $func as function(x
  : resource with the complete path to the resource as parameter.
  :)
 declare function dbutil:scan-resources($collection as xs:anyURI, $func as function(xs:anyURI) as item()*) {
-    for $child in xmldb:get-child-resources($collection)
-    return
-        $func(xs:anyURI($collection || "/" || $child))
+    if (sm:has-access($collection, "rx")) then
+        for $child in xmldb:get-child-resources($collection)
+        return
+            $func(xs:anyURI($collection || "/" || $child))
+    else
+        ()
 };
 
 (:~ 
@@ -37,7 +40,7 @@ declare function dbutil:scan($root as xs:anyURI, $func as function(xs:anyURI, xs
     })
 };
 
-declare function dbutil:find-by-mimetype($collection as xs:anyURI, $mimeType as xs:string) {
+declare function dbutil:find-by-mimetype($collection as xs:anyURI, $mimeType as xs:string+) {
     dbutil:scan($collection, function($collection, $resource) {
         if (exists($resource) and xmldb:get-mime-type($resource) = $mimeType) then
             $resource
@@ -46,7 +49,7 @@ declare function dbutil:find-by-mimetype($collection as xs:anyURI, $mimeType as 
     })
 };
 
-declare function dbutil:find-by-mimetype($collection as xs:anyURI, $mimeType as xs:string, $func as function(xs:anyURI) as item()*) {
+declare function dbutil:find-by-mimetype($collection as xs:anyURI, $mimeType as xs:string+, $func as function(xs:anyURI) as item()*) {
     dbutil:scan($collection, function($collection, $resource) {
         if (exists($resource) and xmldb:get-mime-type($resource) = $mimeType) then
             $func($resource)

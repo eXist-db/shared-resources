@@ -7,16 +7,22 @@
 
 body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
 
-#grey-top { background: @pageBackground url(../images/horizontal.gif) repeat-x 50% 0; height: 100%; }
 .grey-bot { background: url(../images/body-base.gif) repeat-x 50% 100%; padding-bottom: 2em; }
 
 #container { margin: 0 auto 30px auto; }
 
 @media (min-width: 767px) {
+    #grey-top { background: @pageBackground url(../images/horizontal.gif) repeat-x 50% 0; height: 100%; }
     #header { background: @pageBackground url(../images/header.gif) top right no-repeat; height: 120px; width: 100%; }
+    #header a#logo { background: url(../images/existdb.png) center left no-repeat; display: block; width: 220px; height: 100px; text-indent: -999em; outline: 0; margin: 10px 0; }
 }
 
-#header a#logo { background: url(../images/existdb.png) center left no-repeat; display: block; width: 220px; height: 100px; text-indent: -999em; outline: 0; margin: 10px 0; }
+@media (max-width: 767px) {
+    #grey-top { 
+        background: @pageBackground; height: 100%; 
+    }
+    #header { display: none; }
+}
 
 #content { 
     min-height: 600px;
@@ -25,13 +31,15 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
 #sourceforge { background: url(../images/sourceforge.gif) no-repeat 50%; width: 130px; height: 30px; display: block; margin: 30px auto; text-indent: -999em; overflow: hidden; }
 
 #footer { clear: both; margin: 0 auto; padding: 1em 1em; height: 50px; color: #222; background: url(../images/body.gif) repeat 50% 100%; }
-
-#footer ul { float: left; margin: 0 0 0 -4px; }
+#footer .container {
+    padding-left: 0; padding-right: 0;
+}
+#footer ul { float: left; margin: 0 0 0 -4px; padding-left: 0;}
 #footer ul li { display: inline; }
 #footer ul li a { padding: 2px 4px; color: @orange; }
 #footer ul li a:hover { background: #333; }
 
-#copyright { float: right; width: 220px; }
+#copyright { float: right; width: 220px; text-align: right;}
 #copyright p { padding: 0; color: #F3F3F3; }
 
 /* ---------------------------------------- NAVBAR ---------------------------------------- */
@@ -61,7 +69,13 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
     display: none;
 }
 
-@media (max-width: 979px) {
+@media (max-width: 767px) {
+    .navbar-default {
+        height: auto;
+        margin-bottom: 20px;
+        background: url(../images/existdb-web.svg) center left no-repeat;
+        border-bottom: 10px solid #2e2e2e;
+    }
     .navbar-collapse.in {
         z-index: 1000;
         position: absolute;
@@ -89,7 +103,7 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
     }
 }
 
-@media (min-width: 979px) {
+@media (min-width: 767px) {
     .navbar .nav li.dropdown.open>.dropdown-toggle {
         background-color: transparent;
         color: @orange;

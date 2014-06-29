@@ -155,10 +155,6 @@ body {
   color: #222;
   background: url(../images/body.gif) repeat 50% 100%;
 }
-#grey-top {
-  background: #f3f3f3 url(../images/horizontal.gif) repeat-x 50% 0;
-  height: 100%;
-}
 .grey-bot {
   background: url(../images/body-base.gif) repeat-x 50% 100%;
   padding-bottom: 2em;
@@ -167,20 +163,33 @@ body {
   margin: 0 auto 30px auto;
 }
 @media (min-width: 767px) {
+  #grey-top {
+    background: #f3f3f3 url(../images/horizontal.gif) repeat-x 50% 0;
+    height: 100%;
+  }
   #header {
     background: #f3f3f3 url(../images/header.gif) top right no-repeat;
     height: 120px;
     width: 100%;
   }
+  #header a#logo {
+    background: url(../images/existdb.png) center left no-repeat;
+    display: block;
+    width: 220px;
+    height: 100px;
+    text-indent: -999em;
+    outline: 0;
+    margin: 10px 0;
+  }
 }
-#header a#logo {
-  background: url(../images/existdb.png) center left no-repeat;
-  display: block;
-  width: 220px;
-  height: 100px;
-  text-indent: -999em;
-  outline: 0;
-  margin: 10px 0;
+@media (max-width: 767px) {
+  #grey-top {
+    background: #f3f3f3;
+    height: 100%;
+  }
+  #header {
+    display: none;
+  }
 }
 #content {
   min-height: 600px;
@@ -202,9 +211,14 @@ body {
   color: #222;
   background: url(../images/body.gif) repeat 50% 100%;
 }
+#footer .container {
+  padding-left: 0;
+  padding-right: 0;
+}
 #footer ul {
   float: left;
   margin: 0 0 0 -4px;
+  padding-left: 0;
 }
 #footer ul li {
   display: inline;
@@ -219,6 +233,7 @@ body {
 #copyright {
   float: right;
   width: 220px;
+  text-align: right;
 }
 #copyright p {
   padding: 0;
@@ -247,7 +262,13 @@ body {
 .navbar .nav > li > .dropdown-menu:after {
   display: none;
 }
-@media (max-width: 979px) {
+@media (max-width: 767px) {
+  .navbar-default {
+    height: auto;
+    margin-bottom: 20px;
+    background: url(../images/existdb-web.svg) center left no-repeat;
+    border-bottom: 10px solid #2e2e2e;
+  }
   .navbar-collapse.in {
     z-index: 1000;
     position: absolute;
@@ -272,7 +293,7 @@ body {
     display: none;
   }
 }
-@media (min-width: 979px) {
+@media (min-width: 767px) {
   .navbar .nav li.dropdown.open > .dropdown-toggle {
     background-color: transparent;
     color: #ffcb05;

@@ -15,6 +15,18 @@ declare variable $apputil:BAD_ARCHIVE := xs:QName("apputil:BAD_ARCHIVE");
 declare variable $apputil:NOT_FOUND := xs:QName("apputil:NOT_FOUND");
 declare variable $apputil:DEPENDENCY := xs:QName("apputil:DEPENDENCY");
 
+(:~  
+ : Cache abbreviation/collection of installed packages. Used to speed up
+ : the apputil:resolve-abbrev function, which might be called many times
+ : when displaying a page.
+ :)
+declare variable $apputil:PACKAGES :=
+    map:new(
+        for $app in collection(repo:get-root())//expath:package
+        return
+            map:entry($app/@abbrev/string(), util:collection-name($app))
+    );
+    
 (:~
  : Try to find an application by its unique name and return the relative path to which it
  : has been deployed inside the database.
@@ -41,10 +53,10 @@ declare function apputil:resolve($uri as xs:string) as xs:string {
  : or the empty sequence if the package could not be found or is not deployed into the db
  :)
 declare function apputil:resolve-abbrev($abbrev as xs:string) as xs:string {
-    let $path := collection(repo:get-root())//expath:package[@abbrev = $abbrev]
+    let $path := $apputil:PACKAGES($abbrev)
     return
         if ($path) then
-            substring-after(util:collection-name($path), repo:get-root())
+            substring-after($path, repo:get-root())
         else
             ()
 };

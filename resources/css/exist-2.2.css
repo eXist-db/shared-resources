@@ -173,13 +173,15 @@ body {
     width: 100%;
   }
   #header a#logo {
-    background: url(../images/existdb.png) center left no-repeat;
+    background-image: url(../images/existdb.png);
+    background-repeat: no-repeat;
+    background-position: 50% 80%;
     display: block;
     width: 220px;
     height: 100px;
     text-indent: -999em;
     outline: 0;
-    margin: 10px 0;
+    margin: 0;
   }
 }
 @media (max-width: 767px) {
@@ -292,6 +294,9 @@ body {
   #sidebar {
     display: none;
   }
+  #footer .hidden-xs-inline {
+    display: none;
+  }
 }
 @media (min-width: 767px) {
   .navbar .nav li.dropdown.open > .dropdown-toggle {
@@ -328,6 +333,14 @@ body {
   .dropdown-menu > li > a:hover {
     background: #222;
     color: #ffcb05;
+  }
+}
+@media (min-width: 767px) and (max-width: 998px) {
+  .nav > li {
+    min-width: 130px;
+  }
+  #header a#logo {
+    margin: 0;
   }
 }
 .navbar-search input {

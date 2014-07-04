@@ -14,7 +14,16 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
 @media (min-width: 767px) {
     #grey-top { background: @pageBackground url(../images/horizontal.gif) repeat-x 50% 0; height: 100%; }
     #header { background: @pageBackground url(../images/header.gif) top right no-repeat; height: 120px; width: 100%; }
-    #header a#logo { background: url(../images/existdb.png) center left no-repeat; display: block; width: 220px; height: 100px; text-indent: -999em; outline: 0; margin: 10px 0; }
+    #header a#logo { 
+        background-image: url(../images/existdb.png);
+        background-repeat: no-repeat;
+        background-position: 50% 80%;
+        display: block; 
+        width: 220px; 
+        height: 100px; 
+        text-indent: -999em; 
+        outline: 0; 
+        margin: 0; }
 }
 
 @media (max-width: 767px) {
@@ -34,6 +43,7 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
 #footer .container {
     padding-left: 0; padding-right: 0;
 }
+
 #footer ul { float: left; margin: 0 0 0 -4px; padding-left: 0;}
 #footer ul li { display: inline; }
 #footer ul li a { padding: 2px 4px; color: @orange; }
@@ -101,6 +111,10 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
     #sidebar {
         display: none;
     }
+    
+    #footer .hidden-xs-inline {
+        display: none;
+    }
 }
 
 @media (min-width: 767px) {
@@ -144,6 +158,15 @@ body { color: #222; background: url(../images/body.gif) repeat 50% 100%; }
     .dropdown-menu>li>a:hover {
         background: #222;
         color: @orange;
+    }
+}
+
+@media (min-width: 767px) and (max-width: 998px) {
+    .nav>li {
+        min-width: 130px;
+    }
+    #header a#logo {
+        margin: 0;
     }
 }
 

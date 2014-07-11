@@ -166,6 +166,7 @@ body {
   #grey-top {
     background: #f3f3f3 url(../images/horizontal.gif) repeat-x 50% 0;
     height: 100%;
+    position: relative;
   }
   #header {
     background: #f3f3f3 url(../images/header.gif) top right no-repeat;
@@ -173,15 +174,13 @@ body {
     width: 100%;
   }
   #header a#logo {
-    background-image: url(../images/existdb.png);
-    background-repeat: no-repeat;
-    background-position: 50% 80%;
+    background: url(../images/existdb.png) center left no-repeat;
     display: block;
     width: 220px;
     height: 100px;
     text-indent: -999em;
     outline: 0;
-    margin: 0;
+    margin: 10px 0;
   }
 }
 @media (max-width: 767px) {
@@ -208,7 +207,6 @@ body {
 #footer {
   clear: both;
   margin: 0 auto;
-  padding: 1em 1em;
   height: 50px;
   color: #222;
   background: url(../images/body.gif) repeat 50% 100%;
@@ -220,7 +218,7 @@ body {
 #footer ul {
   float: left;
   margin: 0 0 0 -4px;
-  padding-left: 0;
+  padding: 1em 1em 1em 0;
 }
 #footer ul li {
   display: inline;
@@ -236,10 +234,23 @@ body {
   float: right;
   width: 220px;
   text-align: right;
+  padding-top: 1em;
 }
 #copyright p {
   padding: 0;
   color: #F3F3F3;
+}
+#poweredby {
+  position: absolute;
+  right: 5px;
+  bottom: 65px;
+  width: 120px;
+  height: 50px;
+  margin-left: 20px;
+  margin-top: -5px;
+  display: inline-block;
+  background: url(../images/powered-by.svg) no-repeat 50%;
+  background-size: 100% 100%;
 }
 /* ---------------------------------------- NAVBAR ---------------------------------------- */
 .navbar-default {
@@ -294,9 +305,6 @@ body {
   #sidebar {
     display: none;
   }
-  #footer .hidden-xs-inline {
-    display: none;
-  }
 }
 @media (min-width: 767px) {
   .navbar .nav li.dropdown.open > .dropdown-toggle {
@@ -333,14 +341,6 @@ body {
   .dropdown-menu > li > a:hover {
     background: #222;
     color: #ffcb05;
-  }
-}
-@media (min-width: 767px) and (max-width: 998px) {
-  .nav > li {
-    min-width: 130px;
-  }
-  #header a#logo {
-    margin: 0;
   }
 }
 .navbar-search input {

@@ -23,7 +23,7 @@ declare variable $templates:CONFIG_APP_ROOT := "app-root";
 declare variable $templates:CONFIG_ROOT := "root";
 declare variable $templates:CONFIG_FN_RESOLVER := "fn-resolver";
 declare variable $templates:CONFIG_PARAM_RESOLVER := "param-resolver";
-
+declare variable $templates:CONFIG_DEBUG := "debug";
 declare variable $templates:CONFIGURATION := "configuration";
 declare variable $templates:CONFIGURATION_ERROR := QName("http://exist-db.org/xquery/templates", "ConfigurationError");
 declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templates", "NotFound");
@@ -264,7 +264,10 @@ declare %private function templates:process-output($node as element(), $model as
     return
         if ($wrap) then
             element { node-name($node) } {
-                $node/@*,
+                if ($model($templates:CONFIGURATION)($templates:CONFIG_DEBUG)) then
+                    $node/@*
+                else
+                    $node/@*[not(starts-with(local-name(.), "data-template"))],
                 templates:process-output($node, $model, $output)
             }
         else
@@ -498,13 +501,15 @@ declare %private function templates:process-surround($node as node(), $content a
             $node
 };
 
-declare 
-    %templates:wrap
-function templates:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string) {
+declare function templates:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string) {
     for $item in $model($from)
     return
         element { node-name($node) } {
-            $node/@*, templates:process($node/node(), map:new(($model, map:entry($to, $item))))
+            if ($model($templates:CONFIGURATION)($templates:CONFIG_DEBUG)) then
+                    $node/@*
+                else
+                    $node/@*[not(starts-with(local-name(.), "data-template"))], 
+            templates:process($node/node(), map:new(($model, map:entry($to, $item))))
         }
 };
 
@@ -658,14 +663,17 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
                     $node/@*,
                     for $option in $node/*[local-name(.) = "option"]
                     return
-                        element { node-name($option) } {
-                            $option/@*,
-                            if ($option/@value = $value or $option/string() = $value) then
-                                attribute selected { "selected" }
-                            else
-                                (),
-                            $option/node()
-                        }
+                        if (empty($value)) then
+                            $option
+                        else
+                            element { node-name($option) } {
+                                $option/@* except $option/@selected,
+                                if ($option/@value = $value or $option/string() = $value) then
+                                    attribute selected { "selected" }
+                                else
+                                    (),
+                                $option/node()
+                            }
                 }
         default return
             $node
@@ -676,7 +684,11 @@ declare function templates:error-description($node as node(), $model as map(*)) 
     return
         element { node-name($node) } {
             $node/@*,
-            util:parse($input)//message/string()
+            try {
+                util:parse($input)//message/string()
+            } catch * {
+                $input
+            }
         }
 };
 

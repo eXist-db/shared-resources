@@ -281,7 +281,7 @@ declare %private function templates:resolve($func as xs:string, $resolver as fun
 
 declare %private function templates:resolve($arity as xs:int, $func as xs:string, 
     $resolver as function(xs:string, xs:int) as function(*)) {
-    if ($arity > 10) then
+    if ($arity > 15) then
         ()
     else
         let $fn := $resolver($func, $arity)

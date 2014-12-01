@@ -78,7 +78,7 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
                 if (map:contains($configuration, $templates:CONFIG_PARAM_RESOLVER)) then
                     ()
                 else
-                    map:entry($templates:CONFIG_PARAM_RESOLVER, templates:lookup-param-from-restserver#1)
+                    map:entry($templates:CONFIG_PARAM_RESOLVER, templates:lookup-param-from-restserver#2)
             ))
         else
             templates:get-default-config($resolver)
@@ -91,7 +91,7 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
 declare %private function templates:get-default-config($resolver as function(xs:string, xs:int) as item()?) as map(*) {
     map {
         $templates:CONFIG_FN_RESOLVER := $resolver,
-        $templates:CONFIG_PARAM_RESOLVER := templates:lookup-param-from-restserver#1
+        $templates:CONFIG_PARAM_RESOLVER := templates:lookup-param-from-restserver#2
     }
 };
 
@@ -106,7 +106,7 @@ declare %private function templates:first-result($fns as function() as item()**)
                 templates:first-result(subsequence($fns, 2))
 };
 
-declare %private function templates:lookup-param-from-restserver($var as xs:string) as item()* {
+declare %private function templates:lookup-param-from-restserver($var as xs:string, $model as map(*)) as item()* {
     templates:first-result((
         function() { request:get-parameter($var, ()) },
         function() { session:get-attribute($var) },
@@ -200,7 +200,7 @@ declare %private function templates:call-by-introspection($node as element(), $p
     let $inspect := inspect:inspect-function($fn)
     let $fn-name := prefix-from-QName(function-name($fn)) || ":" || local-name-from-QName(function-name($fn))
     let $param-lookup :=  templates:get-configuration($model, $fn-name)($templates:CONFIG_PARAM_RESOLVER)
-    let $args := templates:map-arguments($inspect, $parameters, $param-lookup)
+    let $args := templates:map-arguments($inspect, $parameters, $param-lookup, $model)
     return
         templates:process-output(
             $node,
@@ -282,23 +282,23 @@ declare %private function templates:process-output($node as element(), $model as
             $output
 };
 
-declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) {
+declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*, $model as map(*)) {
     let $args := $inspect/argument
     return
         if (count($args) > 2) then
             for $arg in subsequence($args, 3)
             return
-                templates:map-argument($arg, $parameters, $param-lookup)
+                templates:map-argument($arg, $parameters, $param-lookup, $model)
         else
             ()
 };
 
-declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) 
+declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*, $model as map(*)) 
     as function() as item()* {
     let $var := $arg/@var
     let $type := $arg/@type/string()
     
-    let $looked-up-param := $param-lookup($var)
+    let $looked-up-param := $param-lookup($var,$model)
     let $param-from-context :=
         if(exists($looked-up-param))then
             $looked-up-param

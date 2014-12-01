@@ -282,7 +282,7 @@ declare %private function templates:process-output($node as element(), $model as
             $output
 };
 
-declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*, $model as map(*)) {
+declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string, map()) as item()*, $model as map(*)) {
     let $args := $inspect/argument
     return
         if (count($args) > 2) then
@@ -293,7 +293,7 @@ declare %private function templates:map-arguments($inspect as element(function),
             ()
 };
 
-declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*, $model as map(*)) 
+declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string, map()) as item()*, $model as map(*)) 
     as function() as item()* {
     let $var := $arg/@var
     let $type := $arg/@type/string()

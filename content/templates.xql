@@ -1,4 +1,4 @@
-xquery version "3.0";
+xquery version "3.1";
 
 (:~
  : HTML templating module
@@ -23,7 +23,7 @@ declare variable $templates:CONFIG_APP_ROOT := "app-root";
 declare variable $templates:CONFIG_ROOT := "root";
 declare variable $templates:CONFIG_FN_RESOLVER := "fn-resolver";
 declare variable $templates:CONFIG_PARAM_RESOLVER := "param-resolver";
-declare variable $templates:CONFIG_DEBUG := "debug";
+
 declare variable $templates:CONFIGURATION := "configuration";
 declare variable $templates:CONFIGURATION_ERROR := QName("http://exist-db.org/xquery/templates", "ConfigurationError");
 declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templates", "NotFound");
@@ -205,55 +205,9 @@ declare %private function templates:call-by-introspection($node as element(), $p
         templates:process-output(
             $node,
             $model,
-            templates:call-with-args($fn, $args, $node, $model),
+            apply($fn, array:join(([ $node, $model ], $args))),
             $inspect
         )
-};
-
-declare %private function templates:call-with-args($fn as function(*), $args as (function() as item()*)*, 
-    $node as element(), $model as map(*)) {
-    switch (count($args))
-        case 0 return
-            $fn($node, $model)
-        case 1 return
-            $fn($node, $model, $args[1]())
-        case 2 return
-            $fn($node, $model, $args[1](), $args[2]())
-        case 3 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3]())
-        case 4 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4]())
-        case 5 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5]())
-        case 6 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6]())
-        case 7 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7]())
-        case 8 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8]())
-        case 9 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9]())
-        case 10 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9](), $args[10]())
-        case 11 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9](), $args[10](), $args[11]())
-        case 12 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9](), $args[10](), $args[11](), $args[12]())
-        case 13 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9](), $args[10](), $args[11](), $args[12](), $args[13]())
-        case 14 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9](), $args[10](), $args[11](), $args[12](), $args[13](), $args[14]())
-        case 15 return
-            $fn($node, $model, $args[1](), $args[2](), $args[3](), $args[4](), $args[5](), $args[6](), $args[7](), $args[8](), 
-                $args[9](), $args[10](), $args[11](), $args[12](), $args[13](), $args[14](), $args[15]())
-        default return
-            error($templates:TOO_MANY_ARGS, "Too many arguments to function " || function-name($fn))
 };
 
 declare %private function templates:process-output($node as element(), $model as map(*), $output as item()*, 
@@ -264,10 +218,7 @@ declare %private function templates:process-output($node as element(), $model as
     return
         if ($wrap) then
             element { node-name($node) } {
-                if ($model($templates:CONFIGURATION)($templates:CONFIG_DEBUG)) then
-                    $node/@*
-                else
-                    $node/@*[not(starts-with(local-name(.), "data-template"))],
+                $node/@*,
                 templates:process-output($node, $model, $output)
             }
         else
@@ -282,19 +233,20 @@ declare %private function templates:process-output($node as element(), $model as
             $output
 };
 
-declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) {
+declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) 
+as array(*)* {
     let $args := $inspect/argument
     return
-        if (count($args) > 2) then
+        if (count($args) > 2) then 
             for $arg in subsequence($args, 3)
             return
-                templates:map-argument($arg, $parameters, $param-lookup)
+                [ templates:map-argument($arg, $parameters, $param-lookup) ]
         else
-            ()
+            []
 };
 
 declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) 
-    as function() as item()* {
+    as item()* {
     let $var := $arg/@var
     let $type := $arg/@type/string()
     
@@ -319,9 +271,7 @@ declare %private function templates:map-argument($arg as element(argument), $par
                 $type || ". " || $err:description)
         }
     return
-        function() {
-            $data
-        }
+        $data
 };
 
 declare %private function templates:arg-from-annotation($var as xs:string, $arg as element(argument)) {
@@ -340,15 +290,12 @@ declare %private function templates:resolve($func as xs:string, $resolver as fun
 
 declare %private function templates:resolve($arity as xs:int, $func as xs:string, 
     $resolver as function(xs:string, xs:int) as function(*)) {
-    if ($arity > 15) then
-        ()
-    else
-        let $fn := $resolver($func, $arity)
-        return
-            if (exists($fn)) then
-                $fn
-            else
-                templates:resolve($arity + 1, $func, $resolver)
+    let $fn := $resolver($func, $arity)
+    return
+        if (exists($fn)) then
+            $fn
+        else
+            templates:resolve($arity + 1, $func, $resolver)
 };
 
 declare %private function templates:parameters-from-attr($node as node()) {
@@ -501,15 +448,13 @@ declare %private function templates:process-surround($node as node(), $content a
             $node
 };
 
-declare function templates:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string) {
+declare 
+    %templates:wrap
+function templates:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string) {
     for $item in $model($from)
     return
         element { node-name($node) } {
-            if ($model($templates:CONFIGURATION)($templates:CONFIG_DEBUG)) then
-                    $node/@*
-                else
-                    $node/@*[not(starts-with(local-name(.), "data-template"))], 
-            templates:process($node/node(), map:new(($model, map:entry($to, $item))))
+            $node/@*, templates:process($node/node(), map:new(($model, map:entry($to, $item))))
         }
 };
 

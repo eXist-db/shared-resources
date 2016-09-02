@@ -35,7 +35,7 @@ declare variable $apputil:PACKAGES :=
  : @return database path relative to the collection returned by repo:get-root() 
  : or the empty sequence if the package could not be found or is not deployed into the db
  :)
-declare function apputil:resolve($uri as xs:string) as xs:string {
+declare function apputil:resolve($uri as xs:string) as xs:string? {
     let $path := collection(repo:get-root())//expath:package[@name = $uri]
     return
         if ($path) then
@@ -52,7 +52,7 @@ declare function apputil:resolve($uri as xs:string) as xs:string {
  : @return database path relative to the collection returned by repo:get-root() 
  : or the empty sequence if the package could not be found or is not deployed into the db
  :)
-declare function apputil:resolve-abbrev($abbrev as xs:string) as xs:string {
+declare function apputil:resolve-abbrev($abbrev as xs:string) as xs:string? {
     let $path := $apputil:PACKAGES($abbrev)
     return
         if ($path) then

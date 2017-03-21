@@ -56,6 +56,11 @@
                 <li>Fixed for erroneous return type from two functions in apputil module affecting package installation.</li>
             </ul>
         </change>
+        <change version="0.4.2">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Minor release to restore package/@abbrev value to prevent problems on older systems querying public-repo.</li>
+            </ul>
+        </change>
     </changelog>
     <deployed>2013-11-24T18:45:15.366+01:00</deployed>
 </repo:meta>

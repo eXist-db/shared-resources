@@ -2,3 +2,4 @@ resources/scripts/ace
 build
 expath-pkg.xml
 emmet.js
+local.build.properties

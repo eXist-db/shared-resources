@@ -246,7 +246,7 @@ body {
 #poweredby {
   float: right;
   width: 120px;
-  height: 50px;
+  height: 56px;
   margin-bottom: 10px;
   display: inline-block;
   background: url(../images/powered-by.svg) no-repeat 50%;

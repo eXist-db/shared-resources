@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="shared-resources">
-    <property name="project.app" value="shared-resources"/>
-    <property name="project.version" value="0.4.0"/>
+    <property file="local.build.properties"/>
+    <property file="build.properties"/>
     <property name="tools" value="./tools"/>
     <property name="build" value="./build"/>
     <property name="scripts" value="./resources/scripts"/>
@@ -13,7 +13,7 @@
         <isset property="git.commit"/>
     </condition>
     <target name="all" depends="ace,xar"/>
-    <target     name="rebuild" depends="clean,all"/>
+    <target name="rebuild" depends="clean,all"/>
     <target name="prepare-ace">
         <get src="${emmet.url}" dest="${scripts}/emmet.js"/>
     </target>
@@ -36,10 +36,11 @@
         <mkdir dir="${build}"/>
         <copy file="expath-pkg.xml.tmpl" tofile="expath-pkg.xml" filtering="true" overwrite="true">
             <filterset>
+                <filter token="project.name" value="${project.name}"/>
                 <filter token="project.version" value="${project.version}"/>
             </filterset>
         </copy>
-        <zip destfile="${build}/${project.app}-${project.version}${git.commit}.xar">
+        <zip destfile="${build}/${project.name}-${project.version}${git.commit}.xar">
             <fileset dir=".">
                 <include name="*.*"/>
                 <include name="resources/**"/>
@@ -54,7 +55,7 @@
         <input message="Enter password:" addproperty="server.pass" defaultvalue="">
             <handler type="secure"/>
         </input>
-        <property name="xar" value="${project.app}-${project.version}${git.commit}.xar"/>
+        <property name="xar" value="${project.name}-${project.version}${git.commit}.xar"/>
         <exec executable="curl">
             <arg line="-T ${build}/${xar} -u admin:${server.pass} ${server.url}/${xar}"/>
         </exec>

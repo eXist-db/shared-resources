@@ -429,6 +429,10 @@ declare function templates:include($node as node(), $model as map(*), $path as x
         if (starts-with($path, "/")) then
             (: Search template relative to app root :)
             concat($appRoot, "/", $path)
+        else if (matches($path, "^https?://")) then
+            (: Template is loaded from a URL, this template even if a HTML file, must be
+               returned with mime-type XML and be valid XML, as it is retrieved with fn:doc() :)
+            $path
         else
             (: Locate template relative to HTML file :)
             concat($root, "/", $path)
@@ -444,6 +448,10 @@ declare function templates:surround($node as node(), $model as map(*), $with as 
         if (starts-with($with, "/")) then
             (: Search template relative to app root :)
             concat($appRoot, $with)
+        else if (matches($with, "^https?://")) then
+            (: Template is loaded from a URL, this template even if a HTML file, must be
+               returned with mime-type XML and be valid XML, as it is retrieved with fn:doc() :)
+            $with
         else
             (: Locate template relative to HTML file :)
             concat($root, "/", $with)

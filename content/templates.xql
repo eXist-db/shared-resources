@@ -449,10 +449,9 @@ declare function templates:surround($node as node(), $model as map(*), $with as 
         if (starts-with($with, "/")) then
             (: Search template relative to app root :)
             concat($appRoot, $with)
-        else
-        if (starts-with($with, "http://") or starts-with($with, "https://")) then
+        else if (matches($with, "^https?://")) then
             (: Template is loaded from a URL, this template even if a HTML file, must be
-               returned with mime-type XML :)
+               returned with mime-type XML and be valid XML, as it is retrieved with fn:doc() :)
             $with
         else
             (: Locate template relative to HTML file :)

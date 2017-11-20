@@ -429,10 +429,9 @@ declare function templates:include($node as node(), $model as map(*), $path as x
         if (starts-with($path, "/")) then
             (: Search template relative to app root :)
             concat($appRoot, "/", $path)
-        else
-        if (starts-with($path, "http://") or starts-with($path, "https://")) then
+        else if (matches($path, "^https?://")) then
             (: Template is loaded from a URL, this template even if a HTML file, must be
-               returned with mime-type XML :)
+               returned with mime-type XML and be valid XML, as it is retrieved with fn:doc() :)
             $path
         else
             (: Locate template relative to HTML file :)

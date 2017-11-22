@@ -23,6 +23,7 @@ declare variable $templates:CONFIG_APP_ROOT := "app-root";
 declare variable $templates:CONFIG_ROOT := "root";
 declare variable $templates:CONFIG_FN_RESOLVER := "fn-resolver";
 declare variable $templates:CONFIG_PARAM_RESOLVER := "param-resolver";
+declare variable $templates:CONFIG_PARAM_MAP := "param-map";
 declare variable $templates:CONFIG_DEBUG := "debug";
 declare variable $templates:CONFIGURATION := "configuration";
 declare variable $templates:CONFIGURATION_ERROR := QName("http://exist-db.org/xquery/templates", "ConfigurationError");
@@ -65,7 +66,7 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
  : @param $configuration a map of configuration parameters. For example you may provide a
  :  'parameter value resolver' by mapping $templates:CONFIG_PARAM_RESOLVER to a function
  :  whoose job it is to provide values for templated parameters. The function signature for
- :  the 'parameter value resolver' is f($param-name as xs:string) as item()*
+ :  the 'parameter value resolver' is either f($param-name as xs:string) as item()*.
 :)
 declare function templates:apply($content as node()+, $resolver as function(xs:string, xs:int) as item()?, $model as map(*)?,
     $configuration as map(*)?) {
@@ -77,21 +78,22 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
                 map:entry($templates:CONFIG_FN_RESOLVER, $resolver),
                 if (map:contains($configuration, $templates:CONFIG_PARAM_RESOLVER)) then
                     ()
-                else
-                    map:entry($templates:CONFIG_PARAM_RESOLVER, templates:lookup-param-from-restserver#1)
+                else (
+                    map:entry($templates:CONFIG_PARAM_RESOLVER, templates:lookup-param-from-restserver($model, ?))
+                )
             ))
         else
-            templates:get-default-config($resolver)
+            templates:get-default-config($resolver, $model)
     let $model := map:new(($model, map:entry($templates:CONFIGURATION, $configuration)))
     for $root in $content
     return
         templates:process($root, $model)
 };
 
-declare %private function templates:get-default-config($resolver as function(xs:string, xs:int) as item()?) as map(*) {
+declare %private function templates:get-default-config($resolver as function(xs:string, xs:int) as item()?,$model as map(*)?) as map(*) {
     map {
         $templates:CONFIG_FN_RESOLVER := $resolver,
-        $templates:CONFIG_PARAM_RESOLVER := templates:lookup-param-from-restserver#1
+        $templates:CONFIG_PARAM_RESOLVER := templates:lookup-param-from-restserver($model, ?)
     }
 };
 
@@ -106,8 +108,9 @@ declare %private function templates:first-result($fns as function() as item()**)
                 templates:first-result(subsequence($fns, 2))
 };
 
-declare %private function templates:lookup-param-from-restserver($var as xs:string) as item()* {
+declare %private function templates:lookup-param-from-restserver($model as map(*), $var as xs:string) as item()* {
     templates:first-result((
+        function() { if(map:contains($model,$templates:CONFIG_PARAM_MAP)) then $model($templates:CONFIG_PARAM_MAP)($var) else ()},
         function() { request:get-parameter($var, ()) },
         function() { session:get-attribute($var) },
         function() { request:get-attribute($var) }

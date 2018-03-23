@@ -19,6 +19,8 @@
     </target>
     <target name="ace" depends="prepare-ace">
         <mkdir dir="${ace}"/>
+        <mkdir dir="${ace.src}/build/src-min"/>
+        <mkdir dir="${ace.src}/build/kitchen-sink"/>
         <copy todir="${ace}">
             <fileset dir="${ace.src}/build/src-min"/>
             <fileset dir="${ace.src}/build/kitchen-sink">

@@ -2,8 +2,9 @@ xquery version "3.0";
 
 module namespace site="http://exist-db.org/apps/site-utils";
 
-import module namespace templates="http://exist-db.org/xquery/templates";
 import module namespace apputil="http://exist-db.org/xquery/apps";
+import module namespace request="http://exist-db.org/xquery/request";
+import module namespace templates="http://exist-db.org/xquery/templates";
 
 declare namespace expath="http://expath.org/ns/pkg";
 

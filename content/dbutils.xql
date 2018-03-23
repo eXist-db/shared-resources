@@ -2,6 +2,9 @@ xquery version "3.0";
 
 module namespace dbutil="http://exist-db.org/xquery/dbutil";
 
+import module namespace sm="http://exist-db.org/xquery/securitymanager";
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
+
 (:~ Scan a collection tree recursively starting at $root. Call $func once for each collection found :)
 declare function dbutil:scan-collections($root as xs:anyURI, $func as function(xs:anyURI) as item()*) {
     $func($root),

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<repo:meta xmlns="http://exist-db.org/xquery/repo" xmlns:repo="http://exist-db.org/xquery/repo">
-    <repo:description>Shared resources used by other apps</repo:description>
-    <repo:author>Wolfgang Meier</repo:author>
-    <repo:website>https://github.com/eXist-db/shared-resources</repo:website>
-    <repo:status>alpha</repo:status>
-    <repo:license>GNU-LGPL</repo:license>
-    <repo:copyright>true</repo:copyright>
-    <repo:type>library</repo:type>
-    <repo:target>shared-resources</repo:target>
-    <repo:prepare/>
-    <repo:finish/>
-    <repo:permissions user="admin" password="" group="dba" mode="0775"/>
+<meta xmlns="http://exist-db.org/xquery/repo">
+    <description>Shared resources used by other apps</description>
+    <author>Wolfgang Meier</author>
+    <website>https://github.com/eXist-db/shared-resources</website>
+    <status>alpha</status>
+    <license>GNU-LGPL</license>
+    <copyright>true</copyright>
+    <type>library</type>
+    <target>shared-resources</target>
+    <prepare/>
+    <finish/>
+    <permissions user="admin" password="" group="dba" mode="0775"/>
     <changelog>
         <change version="0.3.5">
             <ul xmlns="http://www.w3.org/1999/xhtml">
@@ -70,4 +70,4 @@
         </change>
     </changelog>
     <deployed>2013-11-24T18:45:15.366+01:00</deployed>
-</repo:meta>
+</meta>

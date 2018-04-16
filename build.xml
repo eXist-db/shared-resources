@@ -31,6 +31,7 @@
     </target>
     <target name="clean">
         <delete dir="${ace}"/>
+        <delete file="${scripts}/emmet.js"/>
         <delete dir="${build}"/>
         <delete file="expath-pkg.xml"/>
     </target>

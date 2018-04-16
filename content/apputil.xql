@@ -6,6 +6,12 @@ xquery version "3.0";
  :)
 module namespace apputil="http://exist-db.org/xquery/apps";
 
+import module namespace compression="http://exist-db.org/xquery/compression";
+import module namespace map="http://www.w3.org/2005/xpath-functions/map";
+import module namespace request="http://exist-db.org/xquery/request";
+import module namespace util="http://exist-db.org/xquery/util";
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
+
 declare namespace expath="http://expath.org/ns/pkg";
 declare namespace repo="http://exist-db.org/xquery/repo";
 

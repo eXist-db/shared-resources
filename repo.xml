@@ -61,6 +61,13 @@
                 <li>Minor release to restore package/@abbrev value to prevent problems on older systems querying public-repo.</li>
             </ul>
         </change>
+        <change version="0.5.0">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>New: Template functions can now accept an arbitrary number of parameters, previously limited to 15 - <a href="https://github.com/eXist-db/shared-resources/pull/29">#29</a></li>
+                <li>New: Templates can be loaded from HTTP and HTTPS URLs - <a href="https://github.com/eXist-db/shared-resources/pull/24">#24</a></li>
+                <li>Fixed: Build problems - <a href="https://github.com/eXist-db/shared-resources/pull/28">#28</a></li>
+            </ul>
+        </change>
     </changelog>
     <deployed>2013-11-24T18:45:15.366+01:00</deployed>
 </repo:meta>

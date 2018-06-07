@@ -194,6 +194,9 @@ declare function apputil:deploy-upload($package as xs:string, $repo-path as xs:s
             $server-uri
         else
             xs:anyURI($server-uri || "/modules/find.xql")
+    (: TODO: We remove the current package before trying to install the new package. 
+       This means if the new package's dependency checks fail and the repo can't satisfy them, we have deleted the package without installing the new one. 
+       Consider checking dependencies before removing the current package. :)
     let $remove := apputil:remove($package)
     let $install :=
         repo:install-and-deploy-from-db($repo-path, $server-uri)

@@ -12,6 +12,7 @@ import module namespace request="http://exist-db.org/xquery/request";
 import module namespace util="http://exist-db.org/xquery/util";
 import module namespace xmldb="http://exist-db.org/xquery/xmldb";
 
+declare namespace err="http://www.w3.org/2005/xqt-errors";
 declare namespace expath="http://expath.org/ns/pkg";
 declare namespace repo="http://exist-db.org/xquery/repo";
 
@@ -124,55 +125,82 @@ declare function apputil:is-installed($pkgURI as xs:anyURI, $version as xs:strin
  : 
  : @param $name unique name of the package to install (optional)
  : @param $package-path the file name of the package to install (optional)
- : @param $serverUri the URI of the public-repo app on the server
+ : @param $server-uri the URI of the public-repo app on the server
  : @return the empty sequence
  :)
-declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $serverUri as xs:anyURI, $version as xs:string?) {
-    let $serverUri :=
-        if (ends-with($serverUri, "/modules/find.xql")) then
-            $serverUri
+declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $server-uri as xs:anyURI, $version as xs:string?) {
+    let $server-uri :=
+        if (ends-with($server-uri, "/modules/find.xql")) then
+            $server-uri
         else
-            xs:anyURI($serverUri || "/modules/find.xql")
+            xs:anyURI($server-uri || "/modules/find.xql")
     let $remove := apputil:remove($name)
     return
-        repo:install-and-deploy($name, $version, $serverUri)
+        repo:install-and-deploy($name, $version, $server-uri)
 };
 
-declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $serverUri as xs:anyURI) {
-    apputil:install-from-repo($name, $package-path, $serverUri, ())
+declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $server-uri as xs:anyURI) {
+    apputil:install-from-repo($name, $package-path, $server-uri, ())
 };
 
-declare function apputil:upload($serverUri as xs:anyURI) as xs:string {
-    let $repocol :=  if (collection($apputil:collection)) then () else xmldb:create-collection('/db/system','repo')
-    let $docName := request:get-uploaded-file-name("uploadedfiles[]")
-    let $file := request:get-uploaded-file-data("uploadedfiles[]")
-    let $serverUri :=
-        if (ends-with($serverUri, "/modules/find.xql")) then
-            $serverUri
-        else
-            xs:anyURI($serverUri || "/modules/find.xql")
+declare function apputil:upload($server-uri as xs:anyURI) as xs:string {
+    let $pkg-metadata := apputil:store-upload()
     return
-        if ($docName) then
-            let $stored := xmldb:store($apputil:collection, xmldb:encode-uri($docName), $file)
-            let $meta :=
-                try {
-                    compression:unzip(
-                        util:binary-doc($stored), apputil:entry-filter#3, 
-                        (),  apputil:entry-data#4, ()
-                    )
-                } catch * {
-                    error($apputil:BAD_ARCHIVE, "Failed to unpack archive: " || $err:description)
-                }
+        apputil:deploy-upload($pkg-metadata, $server-uri)
+};
+
+(:~
+ : Stores an uploaded XAR to the repo, and returns the metadata.
+ :)
+declare function apputil:store-upload() as element(pkg-metadata) {
+    let $repocol := 
+        if (collection($apputil:collection)) then
+            ()
+        else
+            xmldb:create-collection('/db/system','repo')
+    let $doc-name := request:get-uploaded-file-name("uploadedfiles[]")
+    let $file := request:get-uploaded-file-data("uploadedfiles[]")
+    return
+        if ($doc-name) then
+            let $stored := xmldb:store($apputil:collection, xmldb:encode-uri($doc-name), $file)
             return
-                let $package := $meta//expath:package/string(@name)
-                let $remove := apputil:remove($package)
-                let $install :=
-                    repo:install-and-deploy-from-db($stored, $serverUri)
-                return
-                    $docName
+                <pkg-metadata file-name="{$doc-name}" repo-path="{$stored}">{
+                    try {
+                        compression:unzip(
+                            util:binary-doc($stored), apputil:entry-filter#3, 
+                            (),  apputil:entry-data#4, ()
+                        )
+                    } catch * {
+                        error($apputil:BAD_ARCHIVE, "Failed to unpack archive: " || $err:description)
+                    }
+                }</pkg-metadata>
         else
             error($apputil:BAD_ARCHIVE, "No file found")
 };
+
+(:~
+ : Stores an uploaded XAR to the the filename.
+ :)
+declare function apputil:deploy-upload($pkg-metadata as element(pkg-metadata), $server-uri as xs:anyURI) as xs:string {
+    apputil:deploy-upload($pkg-metadata//expath:package/string(@name), $pkg-metadata/@repo-path, $pkg-metadata/@file-name, $server-uri)
+};
+
+(:~
+ : Stores an uploaded XAR to the the filename.
+ :)
+declare function apputil:deploy-upload($package as xs:string, $repo-path as xs:string, $file-name as xs:string, $server-uri as xs:anyURI) as xs:string {
+    let $server-uri :=
+        if (ends-with($server-uri, "/modules/find.xql")) then
+            $server-uri
+        else
+            xs:anyURI($server-uri || "/modules/find.xql")
+    let $remove := apputil:remove($package)
+    let $install :=
+        repo:install-and-deploy-from-db($repo-path, $server-uri)
+    return
+        $file-name
+};
+
 
 (:~
  : Remove the package identified by its unique name.

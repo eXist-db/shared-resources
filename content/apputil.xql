@@ -179,14 +179,14 @@ declare function apputil:store-upload() as element(pkg-metadata) {
 };
 
 (:~
- : Deploys an uploaded XAR to the the filename.
+ : Deploys an uploaded XAR to the database.
  :)
 declare function apputil:deploy-upload($pkg-metadata as element(pkg-metadata), $server-uri as xs:anyURI) as xs:string {
     apputil:deploy-upload($pkg-metadata//expath:package/string(@name), $pkg-metadata/@repo-path, $pkg-metadata/@file-name, $server-uri)
 };
 
 (:~
- : Deploys an uploaded XAR to the the filename.
+ : Deploys an uploaded XAR to the database.
  :)
 declare function apputil:deploy-upload($package as xs:string, $repo-path as xs:string, $file-name as xs:string, $server-uri as xs:anyURI) as xs:string {
     let $server-uri :=

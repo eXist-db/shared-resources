@@ -96,7 +96,7 @@ declare function apputil:get-resource($app as xs:string, $path as xs:string) as 
     let $data := if (exists($meta)) then util:binary-to-string($meta) else ()
     return
         if (exists($data)) then
-            util:parse($data)
+            parse-xml($data)
         else
             ()
 };

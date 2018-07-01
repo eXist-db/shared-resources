@@ -347,7 +347,7 @@ declare %private function templates:cast($values as item()*, $targetType as xs:s
                 case "xs:time" return
                     xs:time($value)
                 case "element()" return
-                    util:parse($value)/*
+                    parse-xml($value)/*
                 case "text()" return
                     text { string($value) }
                 default return
@@ -638,7 +638,7 @@ declare function templates:error-description($node as node(), $model as map(*)) 
         element { node-name($node) } {
             $node/@*,
             try {
-                util:parse($input)//message/string()
+                parse-xml($input)//message/string()
             } catch * {
                 $input
             }

@@ -5,7 +5,8 @@ xquery version "3.1";
  : 
  : @version 2.1
  : @author Wolfgang Meier
- : @contributor Adam retter
+ : @contributor Adam Retter
+ : @contributor Joe Wicentowski
 :)
 module namespace templates="http://exist-db.org/xquery/templates";
 
@@ -30,6 +31,7 @@ declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templ
 declare variable $templates:TOO_MANY_ARGS := QName("http://exist-db.org/xquery/templates", "TooManyArguments");
 declare variable $templates:PROCESSING_ERROR := QName("http://exist-db.org/xquery/templates", "ProcessingError");
 declare variable $templates:TYPE_ERROR := QName("http://exist-db.org/xquery/templates", "TypeError");
+declare variable $templates:MAX_ARITY := 20;
 
 declare variable $templates:ATTR_DATA_TEMPLATE := "data-template";
 
@@ -294,6 +296,8 @@ declare %private function templates:resolve($arity as xs:int, $func as xs:string
     return
         if (exists($fn)) then
             $fn
+        else if ($arity ge $templates:MAX_ARITY) then
+            ()
         else
             templates:resolve($arity + 1, $func, $resolver)
 };

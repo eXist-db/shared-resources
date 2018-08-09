@@ -189,7 +189,11 @@ declare %private function templates:call($classOrAttr as item(), $node as elemen
         if (exists($call)) then
             templates:call-by-introspection($node, $parameters, $model, $call)
         else if ($model($templates:CONFIGURATION)($templates:CONFIG_STOP_ON_ERROR)) then
-            error($templates:NOT_FOUND, "No template function found for call " || $func)
+            error($templates:NOT_FOUND, 
+                "No template function found for call " || $func || 
+                " (Max arity of " || $templates:MAX_ARITY ||
+                " has been exceeded in searching for this template function." ||
+                "If needed, adjust $templates:MAX_ARITY in the templates.xql module.)")
         else
             (: Templating function not found: just copy the element :)
             element { node-name($node) } {

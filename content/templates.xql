@@ -5,7 +5,8 @@ xquery version "3.1";
  : 
  : @version 2.1
  : @author Wolfgang Meier
- : @contributor Adam retter
+ : @contributor Adam Retter
+ : @contributor Joe Wicentowski
 :)
 module namespace templates="http://exist-db.org/xquery/templates";
 
@@ -30,6 +31,7 @@ declare variable $templates:NOT_FOUND := QName("http://exist-db.org/xquery/templ
 declare variable $templates:TOO_MANY_ARGS := QName("http://exist-db.org/xquery/templates", "TooManyArguments");
 declare variable $templates:PROCESSING_ERROR := QName("http://exist-db.org/xquery/templates", "ProcessingError");
 declare variable $templates:TYPE_ERROR := QName("http://exist-db.org/xquery/templates", "TypeError");
+declare variable $templates:MAX_ARITY := 20;
 
 declare variable $templates:ATTR_DATA_TEMPLATE := "data-template";
 
@@ -187,7 +189,11 @@ declare %private function templates:call($classOrAttr as item(), $node as elemen
         if (exists($call)) then
             templates:call-by-introspection($node, $parameters, $model, $call)
         else if ($model($templates:CONFIGURATION)($templates:CONFIG_STOP_ON_ERROR)) then
-            error($templates:NOT_FOUND, "No template function found for call " || $func)
+            error($templates:NOT_FOUND, 
+                "No template function found for call " || $func || 
+                " (Max arity of " || $templates:MAX_ARITY ||
+                " has been exceeded in searching for this template function." ||
+                "If needed, adjust $templates:MAX_ARITY in the templates.xql module.)")
         else
             (: Templating function not found: just copy the element :)
             element { node-name($node) } {
@@ -294,6 +300,8 @@ declare %private function templates:resolve($arity as xs:int, $func as xs:string
     return
         if (exists($fn)) then
             $fn
+        else if ($arity ge $templates:MAX_ARITY) then
+            ()
         else
             templates:resolve($arity + 1, $func, $resolver)
 };

@@ -68,6 +68,21 @@
                 <li>Fixed: Build problems - <a href="https://github.com/eXist-db/shared-resources/pull/28">#28</a></li>
             </ul>
         </change>
+        <change version="0.6.0">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Fixed: Split some functions into calls to smaller functions. Backwards compatible</li>
+            </ul>
+        </change>
+        <change version="0.7.0">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Improved internal documentation</li>
+            </ul>
+        </change>
+        <change version="0.8.0">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Fixed - Infinite look in function lookup <a href="https://github.com/eXist-db/shared-resources/issues/33">#33</a></li>
+            </ul>
+        </change>
     </changelog>
     <deployed>2013-11-24T18:45:15.366+01:00</deployed>
 </meta>

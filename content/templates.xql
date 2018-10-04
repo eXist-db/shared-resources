@@ -193,7 +193,7 @@ declare %private function templates:call($classOrAttr as item(), $node as elemen
                 "No template function found for call " || $func || 
                 " (Max arity of " || $templates:MAX_ARITY ||
                 " has been exceeded in searching for this template function." ||
-                "If needed, adjust $templates:MAX_ARITY in the templates.xql module.)")
+                " If needed, adjust $templates:MAX_ARITY in the templates.xql module.)")
         else
             (: Templating function not found: just copy the element :)
             element { node-name($node) } {

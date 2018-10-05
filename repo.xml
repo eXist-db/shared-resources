@@ -88,6 +88,11 @@
                 <li>Fixed: Restore legacy difference between package abbrev and app name - <a href="https://github.com/eXist-db/shared-resources/issues/36">#36</a></li>
             </ul>
         </change>
+        <change version="0.8.2">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Hotfixe: Restore ACE editor components <a href="https://github.com/eXist-db/shared-resources/issues/38">#38</a></li>
+            </ul>
+        </change>
     </changelog>
     <deployed>2013-11-24T18:45:15.366+01:00</deployed>
 </meta>

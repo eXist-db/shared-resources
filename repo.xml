@@ -58,7 +58,7 @@
         </change>
         <change version="0.4.2">
             <ul xmlns="http://www.w3.org/1999/xhtml">
-                <li>Minor release to restore package/@abbrev value to prevent problems on older systems querying public-repo.</li>
+                <li>Fixed: Restore package/@abbrev value to prevent problems on older systems querying public-repo - <a href="https://github.com/eXist-db/shared-resources/pull/22">#22</a></li>
             </ul>
         </change>
         <change version="0.5.0">
@@ -70,17 +70,22 @@
         </change>
         <change version="0.6.0">
             <ul xmlns="http://www.w3.org/1999/xhtml">
-                <li>Fixed: Split some functions into calls to smaller functions. Backwards compatible</li>
+                <li>Fixed: Split some functions into calls to smaller functions. Backwards compatible.</li>
             </ul>
         </change>
         <change version="0.7.0">
             <ul xmlns="http://www.w3.org/1999/xhtml">
-                <li>Improved internal documentation</li>
+                <li>Improved: Internal function documentation</li>
             </ul>
         </change>
         <change version="0.8.0">
             <ul xmlns="http://www.w3.org/1999/xhtml">
-                <li>Fixed - Infinite look in function lookup <a href="https://github.com/eXist-db/shared-resources/issues/33">#33</a></li>
+                <li>Fixed: Infinite loop in function lookup - <a href="https://github.com/eXist-db/shared-resources/issues/33">#33</a></li>
+            </ul>
+        </change>
+        <change version="0.8.1">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Fixed: Restore legacy difference between package abbrev and app name - <a href="https://github.com/eXist-db/shared-resources/issues/36">#36</a></li>
             </ul>
         </change>
     </changelog>

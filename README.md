@@ -22,8 +22,8 @@ Next, call ant on the build.xml file in shared-resources:
      ant
 
 You should now find a .xar file in the build directory:
-     
-     build/shared-resources-0.3.0.xar
 
-The .xar file is an installable package containing shared-resources. You can install this into any eXist-db 
+     build/shared-resources-0.8.2.xar
+
+The .xar file is an installable package containing shared-resources. You can install this into any eXist-db
 instance using the application repository manager in the dashboard.

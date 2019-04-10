@@ -2,7 +2,7 @@ xquery version "3.1";
 
 (:~
  : HTML templating module
- : 
+ :
  : @version 2.1
  : @author Wolfgang Meier
  : @contributor Adam Retter
@@ -13,11 +13,11 @@ module namespace templates="http://exist-db.org/xquery/templates";
 import module namespace inspect="http://exist-db.org/xquery/inspection" at "java:org.exist.xquery.functions.inspect.InspectionModule";
 import module namespace map="http://www.w3.org/2005/xpath-functions/map";
 import module namespace request="http://exist-db.org/xquery/request";
-import module namespace repo="http://exist-db.org/xquery/repo"; 
+import module namespace repo="http://exist-db.org/xquery/repo";
 import module namespace session="http://exist-db.org/xquery/session";
 import module namespace util="http://exist-db.org/xquery/util";
 
-declare namespace expath="http://expath.org/ns/pkg"; 
+declare namespace expath="http://expath.org/ns/pkg";
 
 declare variable $templates:CONFIG_STOP_ON_ERROR := "stop-on-error";
 declare variable $templates:CONFIG_APP_ROOT := "app-root";
@@ -40,7 +40,7 @@ declare variable $templates:ATTR_DATA_TEMPLATE := "data-template";
  : provided function $resolver. The function should take a name as a string
  : and return the corresponding function item. The simplest implementation of this function could
  : look like this:
- : 
+ :
  : <pre>function($functionName as xs:string, $arity as xs:int) { function-lookup(xs:QName($functionName), $arity) }</pre>
  :
  : @param $content the sequence of nodes which will be processed
@@ -57,7 +57,7 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
  : provided function $resolver. The function should take a name as a string
  : and return the corresponding function item. The simplest implementation of this function could
  : look like this:
- : 
+ :
  : <pre>function($functionName as xs:string, $arity as xs:int) { function-lookup(xs:QName($functionName), $arity) }</pre>
  :
  : @param $content the sequence of nodes which will be processed
@@ -71,11 +71,11 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
 :)
 declare function templates:apply($content as node()+, $resolver as function(xs:string, xs:int) as item()?, $model as map(*)?,
     $configuration as map(*)?) {
-    let $model := if (exists($model)) then $model else map:new()
-    let $configuration := 
+    let $model := if (exists($model)) then $model else map {}
+    let $configuration :=
         if (exists($configuration)) then
-            map:new((
-                $configuration, 
+            map:merge((
+                $configuration,
                 map:entry($templates:CONFIG_FN_RESOLVER, $resolver),
                 if (map:contains($configuration, $templates:CONFIG_PARAM_RESOLVER)) then
                     ()
@@ -84,7 +84,7 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
             ))
         else
             templates:get-default-config($resolver)
-    let $model := map:new(($model, map:entry($templates:CONFIGURATION, $configuration)))
+    let $model := map:merge(($model, map:entry($templates:CONFIGURATION, $configuration)))
     for $root in $content
     return
         templates:process($root, $model)
@@ -174,7 +174,7 @@ declare %private function templates:call($classOrAttr as item(), $node as elemen
                 let $paramStr := substring-after($classOrAttr, "?")
                 return
                     templates:parse-parameters($paramStr)
-    let $func := 
+    let $func :=
         typeswitch ($classOrAttr)
             case attribute() return
                 $classOrAttr/string()
@@ -189,8 +189,8 @@ declare %private function templates:call($classOrAttr as item(), $node as elemen
         if (exists($call)) then
             templates:call-by-introspection($node, $parameters, $model, $call)
         else if ($model($templates:CONFIGURATION)($templates:CONFIG_STOP_ON_ERROR)) then
-            error($templates:NOT_FOUND, 
-                "No template function found for call " || $func || 
+            error($templates:NOT_FOUND,
+                "No template function found for call " || $func ||
                 " (Max arity of " || $templates:MAX_ARITY ||
                 " has been exceeded in searching for this template function." ||
                 " If needed, adjust $templates:MAX_ARITY in the templates.xql module.)")
@@ -201,7 +201,7 @@ declare %private function templates:call($classOrAttr as item(), $node as elemen
             }
 };
 
-declare %private function templates:call-by-introspection($node as element(), $parameters as map(xs:string, xs:string), $model as map(*), 
+declare %private function templates:call-by-introspection($node as element(), $parameters as map(xs:string, xs:string), $model as map(*),
     $fn as function(*)) {
     let $inspect := inspect:inspect-function($fn)
     let $fn-name := prefix-from-QName(function-name($fn)) || ":" || local-name-from-QName(function-name($fn))
@@ -216,9 +216,9 @@ declare %private function templates:call-by-introspection($node as element(), $p
         )
 };
 
-declare %private function templates:process-output($node as element(), $model as map(*), $output as item()*, 
+declare %private function templates:process-output($node as element(), $model as map(*), $output as item()*,
     $inspect as element(function)) {
-    let $wrap := 
+    let $wrap :=
         $inspect/annotation[ends-with(@name, ":wrap")]
             [@namespace = "http://exist-db.org/xquery/templates"]
     return
@@ -234,16 +234,16 @@ declare %private function templates:process-output($node as element(), $model as
 declare %private function templates:process-output($node as element(), $model as map(*), $output as item()*) {
     typeswitch($output)
         case map(*) return
-            templates:process($node/node(), map:new(($model, $output)))
+            templates:process($node/node(), map:merge(($model, $output)))
         default return
             $output
 };
 
-declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) 
+declare %private function templates:map-arguments($inspect as element(function), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*)
 as array(*)* {
     let $args := $inspect/argument
     return
-        if (count($args) > 2) then 
+        if (count($args) > 2) then
             for $arg in subsequence($args, 3)
             return
                 [ templates:map-argument($arg, $parameters, $param-lookup) ]
@@ -251,18 +251,18 @@ as array(*)* {
             []
 };
 
-declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*) 
+declare %private function templates:map-argument($arg as element(argument), $parameters as map(xs:string, xs:string), $param-lookup as function(xs:string) as item()*)
     as item()* {
     let $var := $arg/@var
     let $type := $arg/@type/string()
-    
+
     let $looked-up-param := $param-lookup($var)
     let $param-from-context :=
         if(exists($looked-up-param))then
             $looked-up-param
         else
             $parameters($var)
-            
+
     let $param :=
         if (exists($param-from-context)) then
             $param-from-context
@@ -281,7 +281,7 @@ declare %private function templates:map-argument($arg as element(argument), $par
 };
 
 declare %private function templates:arg-from-annotation($var as xs:string, $arg as element(argument)) {
-    let $anno := 
+    let $anno :=
         $arg/../annotation[ends-with(@name, ":default")]
             [@namespace = "http://exist-db.org/xquery/templates"]
             [value[1] = $var]
@@ -294,7 +294,7 @@ declare %private function templates:resolve($func as xs:string, $resolver as fun
     templates:resolve(2, $func, $resolver)
 };
 
-declare %private function templates:resolve($arity as xs:int, $func as xs:string, 
+declare %private function templates:resolve($arity as xs:int, $func as xs:string,
     $resolver as function(xs:string, xs:int) as function(*)) {
     let $fn := $resolver($func, $arity)
     return
@@ -307,7 +307,7 @@ declare %private function templates:resolve($arity as xs:int, $func as xs:string
 };
 
 declare %private function templates:parameters-from-attr($node as node()) {
-    map:new(
+    map:merge(
         for $attr in $node/@*[starts-with(local-name(.), $templates:ATTR_DATA_TEMPLATE)]
         return
             map:entry(
@@ -318,7 +318,7 @@ declare %private function templates:parameters-from-attr($node as node()) {
 };
 
 declare %private function templates:parse-parameters($paramStr as xs:string?) as map(xs:string, xs:string) {
-    map:new(
+    map:merge(
         for $param in tokenize($paramStr, "&amp;")
         let $key := substring-before($param, "=")
         let $value := substring-after($param, "=")
@@ -376,11 +376,11 @@ declare function templates:get-root($model as map(*)) as xs:string? {
 (:-----------------------------------------------------------------------------------
  : Standard templates
  :-----------------------------------------------------------------------------------:)
- 
+
 declare function templates:include($node as node(), $model as map(*), $path as xs:string) {
     let $appRoot := templates:get-app-root($model)
     let $root := templates:get-root($model)
-    let $path := 
+    let $path :=
         if (starts-with($path, "/")) then
             (: Search template relative to app root :)
             concat($appRoot, "/", $path)
@@ -395,7 +395,7 @@ declare function templates:include($node as node(), $model as map(*), $path as x
         templates:process(doc($path), $model)
 };
 
-declare function templates:surround($node as node(), $model as map(*), $with as xs:string, $at as xs:string?, 
+declare function templates:surround($node as node(), $model as map(*), $with as xs:string, $at as xs:string?,
     $using as xs:string?, $options as xs:string?) {
     let $appRoot := templates:get-app-root($model)
     let $root := templates:get-root($model)
@@ -430,7 +430,7 @@ declare function templates:surround($node as node(), $model as map(*), $with as 
 
 declare %private function templates:surround-options($model as map(*), $optionsStr as xs:string?) as map(*) {
     if (exists($optionsStr)) then
-        map:new((
+        map:merge((
             $model,
             for $option in tokenize($optionsStr, "\s*,\s*")
             let $keyValue := tokenize($option, "\s*=\s*")
@@ -464,18 +464,18 @@ declare %private function templates:process-surround($node as node(), $content a
             $node
 };
 
-declare 
+declare
     %templates:wrap
 function templates:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string) {
     for $item in $model($from)
     return
         element { node-name($node) } {
-            $node/@*, templates:process($node/node(), map:new(($model, map:entry($to, $item))))
+            $node/@*, templates:process($node/node(), map:merge(($model, map:entry($to, $item))))
         }
 };
 
 declare function templates:if-parameter-set($node as node(), $model as map(*), $param as xs:string) as node()* {
-    let $param := templates:get-configuration($model, "templates:if-parameter-set")($templates:CONFIG_PARAM_RESOLVER)($param) 
+    let $param := templates:get-configuration($model, "templates:if-parameter-set")($templates:CONFIG_PARAM_RESOLVER)($param)
     return
         if ($param and string-length($param) gt 0) then
             templates:process($node/node(), $model)
@@ -567,7 +567,7 @@ declare function templates:load-source($node as node(), $model as map(*)) as nod
 (:~
  : Locates the package identified by $uri and returns a path which can be used to link
  : to this package from within the HTML view of another package.
- : 
+ :
  : $uri the unique name of the package to locate
  : $relLink a relative path to be added to the returned path
  :)

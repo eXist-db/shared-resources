@@ -7,16 +7,12 @@
     <property name="ace" value="${scripts}/ace"/>
     <property name="ace.src" value="./support/ace"/>
     <property name="server.url" value="http://demo.exist-db.org/exist/apps/public-repo/public/"/>
-    <property name="emmet.url" value="https://nightwing.github.io/emmet-core/emmet.js"/>
     <condition property="git.commit" value="${git.commit}" else="">
         <isset property="git.commit"/>
     </condition>
     <target name="all" depends="ace,xar"/>
     <target name="rebuild" depends="clean,all"/>
-    <target name="prepare-ace">
-        <get src="${emmet.url}" dest="${scripts}/emmet.js"/>
-    </target>
-    <target name="ace" depends="prepare-ace">
+    <target name="ace">
         <mkdir dir="${ace}"/>
         <mkdir dir="${ace.src}/build/src-min"/>
         <mkdir dir="${ace.src}/build/kitchen-sink"/>
@@ -30,7 +26,6 @@
     </target>
     <target name="clean">
         <delete dir="${ace}"/>
-        <delete file="${scripts}/emmet.js"/>
         <delete dir="${build}"/>
         <delete file="expath-pkg.xml"/>
     </target>

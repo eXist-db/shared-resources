@@ -28,7 +28,7 @@ declare variable $apputil:DEPENDENCY := xs:QName("apputil:DEPENDENCY");
  : when displaying a page.
  :)
 declare variable $apputil:PACKAGES :=
-    map:new(
+    map:merge(
         for $app in collection(repo:get-root())//expath:package
         return
             map:entry($app/@abbrev/string(), util:collection-name($app))

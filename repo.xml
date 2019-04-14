@@ -90,7 +90,12 @@
         </change>
         <change version="0.8.2">
             <ul xmlns="http://www.w3.org/1999/xhtml">
-                <li>Hotfixe: Restore ACE editor components <a href="https://github.com/eXist-db/shared-resources/issues/38">#38</a></li>
+                <li>Hotfix: Restore ACE editor components <a href="https://github.com/eXist-db/shared-resources/issues/38">#38</a></li>
+            </ul>
+        </change>
+        <change version="0.8.3">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Fixed: Switched from deprecated xmldb functions to security manager module for compatibility with forthcoming eXist 5.0.0-RC8</li>
             </ul>
         </change>
     </changelog>

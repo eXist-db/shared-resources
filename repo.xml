@@ -98,6 +98,11 @@
                 <li>Fixed: Switched from deprecated xmldb functions to security manager module for compatibility with forthcoming eXist 5.0.0-RC8</li>
             </ul>
         </change>
+        <change version="0.8.4">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>Fixed: Removed deprecated draft map constructor for compatibility with forthcoming eXist 5.0.0-RC8</li>
+            </ul>
+        </change>
     </changelog>
     <deployed>2013-11-24T18:45:15.366+01:00</deployed>
 </meta>

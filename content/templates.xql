@@ -92,8 +92,8 @@ declare function templates:apply($content as node()+, $resolver as function(xs:s
 
 declare %private function templates:get-default-config($resolver as function(xs:string, xs:int) as item()?) as map(*) {
     map {
-        $templates:CONFIG_FN_RESOLVER := $resolver,
-        $templates:CONFIG_PARAM_RESOLVER := templates:lookup-param-from-restserver#1
+        $templates:CONFIG_FN_RESOLVER : $resolver,
+        $templates:CONFIG_PARAM_RESOLVER : templates:lookup-param-from-restserver#1
     }
 };
 

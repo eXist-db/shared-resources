@@ -130,10 +130,10 @@ declare function apputil:is-installed($pkgURI as xs:anyURI, $version as xs:strin
  :)
 declare function apputil:install-from-repo($name as xs:string?, $package-path as xs:anyURI?, $server-uri as xs:anyURI, $version as xs:string?) {
     let $server-uri :=
-        if (ends-with($server-uri, "/modules/find.xql")) then
+        if (ends-with($server-uri, "/find")) then
             $server-uri
         else
-            xs:anyURI($server-uri || "/modules/find.xql")
+            xs:anyURI($server-uri || "/find")
     let $remove := apputil:remove($name)
     return
         repo:install-and-deploy($name, $version, $server-uri)
@@ -190,10 +190,10 @@ declare function apputil:deploy-upload($pkg-metadata as element(pkg-metadata), $
  :)
 declare function apputil:deploy-upload($package as xs:string, $repo-path as xs:string, $file-name as xs:string, $server-uri as xs:anyURI) as xs:string {
     let $server-uri :=
-        if (ends-with($server-uri, "/modules/find.xql")) then
+        if (ends-with($server-uri, "/find")) then
             $server-uri
         else
-            xs:anyURI($server-uri || "/modules/find.xql")
+            xs:anyURI($server-uri || "/find")
     (: TODO: We remove the current package before trying to install the new package. 
        This means if the new package's dependency checks fail and the repo can't satisfy them, we have deleted the package without installing the new one. 
        Consider checking dependencies before removing the current package. :)

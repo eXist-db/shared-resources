@@ -325,7 +325,7 @@
                		if (title == "") {
                			alert("Enter a valid title");
                			return false;
-           	};
+           		};
 		
     		$(pages[currentPage]).css("display", "none");
     		$(pages[++currentPage]).css("display", "");

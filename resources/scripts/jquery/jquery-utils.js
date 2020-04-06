@@ -312,7 +312,7 @@
            	var abbrev = document.getElementsByName('abbrev')[0].value;
            	var title = document.getElementsByName('title')[0].value;
 
-                if (name.startsWith('urn:')) {
+                if (name.startsWith('urn:') || name.startsWith('file:')) {
                     alert("It cannot be a URN.")
                     return false;} else {
                        try {

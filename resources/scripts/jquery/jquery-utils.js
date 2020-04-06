@@ -313,7 +313,7 @@
            	var title = document.getElementsByName('title')[0].value;
 
                 if (name.startsWith('urn:') || name.startsWith('file:')) {
-                    alert("It cannot be a URN.")
+                    alert("The name cannot be a urn:// or a file:// protocol.")
                     return false;} else {
                        try {
                            nameURL = new URL(name);

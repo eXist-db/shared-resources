@@ -309,23 +309,28 @@
     		if (currentPage == pages.length - 1)
     			return;
 		var name = document.getElementsByName('name')[0].value;
-		var abbrev = document.getElementsByName('abbrev')[0].value;
-		var title = document.getElementsByName('title')[0].value;
+           	var abbrev = document.getElementsByName('abbrev')[0].value;
+           	var title = document.getElementsByName('title')[0].value;
 
-		try {
-			nameURL = new URL(name);
-			} catch (_) {
-			return alert("Enter a valid URI as name.");  
-		}
+                if (name.startsWith('urn:')) {
+                    alert("It cannot be a URN.")
+                    return false;} else {
+                       try {
+                           nameURL = new URL(name);
+                           } catch (_) {
+                           return alert("Enter a valid URI as name.");
+                        }
+                    }
 
-		if (abbrev == "") {
-			alert("Enter a valid abbreviation");
-			return false;
-		};
-		if (title == "") {
-			alert("Enter a valid title");
-			return false;
-		};
+                if (abbrev == "") {
+                alert("Enter a valid abbreviation");
+                return false;
+           	};
+		
+                if (title == "") {
+                alert("Enter a valid title");
+                return false;
+           	};
 
     		$(pages[currentPage]).css("display", "none");
     		$(pages[++currentPage]).css("display", "");

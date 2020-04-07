@@ -308,12 +308,12 @@
     	$(".eXist_wizard_next", container).click(function () {
     		if (currentPage == pages.length - 1)
     			return;
-		var name = document.getElementsByName('name')[0].value;
-           	var abbrev = document.getElementsByName('abbrev')[0].value;
-           	var title = document.getElementsByName('title')[0].value;
+		const name = document.getElementsByName('name')[0].value;
+           	const abbrev = document.getElementsByName('abbrev')[0].value;
+           	const title = document.getElementsByName('title')[0].value;
 
-                if (name.startsWith('urn:') || name.startsWith('file:')) {
-                    alert("The name cannot be in a urn:// or a file:// protocol.")
+                if (name.startsWith('file:')) {
+                    alert("The name cannot use a file:// protocol.")
                     return false;} else {
                        try {
                            nameURL = new URL(name);

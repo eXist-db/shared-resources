@@ -304,7 +304,7 @@
     		$(pages[i]).css("display", "none");
     	}
     	$(".eXist_wizard_back", container).button("disable");
-    	
+    	$(".eXist_wizard_done", container).button("disable");
     	$(".eXist_wizard_next", container).click(function () {
     		if (currentPage == pages.length - 1)
     			return;
@@ -337,6 +337,7 @@
     		$(pages[++currentPage]).css("display", "");
     		if (currentPage == 1) {
     			$(".eXist_wizard_back", container).button("enable");
+			$(".eXist_wizard_done", container).button("enable");
     		} else if (currentPage == pages.length - 1) {
     			$(this).button("disable");
     		}

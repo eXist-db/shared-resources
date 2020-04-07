@@ -309,7 +309,6 @@
     		if (currentPage == pages.length - 1)
     			return;
 		const name = document.getElementsByName('name')[0].value;
-           	const abbrev = document.getElementsByName('abbrev')[0].value;
            	const title = document.getElementsByName('title')[0].value;
 
                 if (name.startsWith('file:')) {
@@ -321,8 +320,10 @@
                            return alert("Enter a valid URI as name.");
                         }
                     }
-
-                if (abbrev == "") {
+		
+		const abbrev = document.getElementsByName('abbrev')[0].value;
+                
+		if (abbrev == "") {
                 alert("Enter a valid abbreviation");
                 return false;
            	};

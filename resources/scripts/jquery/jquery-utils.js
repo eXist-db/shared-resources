@@ -316,7 +316,7 @@
                     alert("The name cannot use a file:// protocol.")
                     return false;} else {
                        try {
-                           nameURL = new URL(name);
+                           new URL(name);
                            } catch (_) {
                            return alert("Enter a valid URI as name.");
                         }

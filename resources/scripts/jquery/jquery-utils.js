@@ -309,7 +309,6 @@
     		if (currentPage == pages.length - 1)
     			return;
 		const name = document.getElementsByName('name')[0].value;
-           	const title = document.getElementsByName('title')[0].value;
 
                 if (name.startsWith('file:')) {
                     alert("The name cannot use a file:// protocol.")
@@ -328,6 +327,7 @@
                 return false;
            	};
 		
+		const title = document.getElementsByName('title')[0].value;
                 if (title == "") {
                 alert("Enter a valid title");
                 return false;

@@ -328,6 +328,7 @@
            	};
 		
 		const title = document.getElementsByName('title')[0].value;
+		
                 if (title == "") {
                 alert("Enter a valid title");
                 return false;

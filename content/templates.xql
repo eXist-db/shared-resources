@@ -596,6 +596,13 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
     let $control := local-name($node)
     return
         switch ($control)
+        case "form" return
+            element { node-name($node) }{
+                $node/@* except $node/@action,
+                attribute action { request:get-parameter('origin', '') },
+                for $n in $node/node()
+                return templates:form-control($n, $model)
+            }
         case "input" return
             let $type := $node/@type
             let $name := $node/@name

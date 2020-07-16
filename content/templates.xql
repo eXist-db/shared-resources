@@ -599,7 +599,7 @@ declare function templates:form-control($node as node(), $model as map(*)) as no
         case "form" return
             element { node-name($node) }{
                 $node/@* except $node/@action,
-                attribute action { request:get-parameter('origin', '') },
+                attribute action { templates:get-configuration($model, "templates:form-control")($templates:CONFIG_PARAM_RESOLVER)("origin") },
                 for $n in $node/node()
                 return templates:form-control($n, $model)
             }

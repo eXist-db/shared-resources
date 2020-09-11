@@ -109,5 +109,10 @@
                 <li>Fixed: Prevent empty fields and validate the URI in the eXide new app wizard - <a href="https://github.com/eXist-db/shared-resources/pull/48">#48</a></li>
             </ul>
         </change>
+        <change version="0.9.0">
+            <ul xmlns="http://www.w3.org/1999/xhtml">
+                <li>New: Extend form control to manipulate xhtml:form/@action values via templating - <a href="https://github.com/eXist-db/shared-resources/pull/51">#51</a></li>
+            </ul>
+        </change>
     </changelog>
 </meta>

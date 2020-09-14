@@ -3,3 +3,4 @@ build
 expath-pkg.xml
 emmet.js
 local.build.properties
+.DS_Store
